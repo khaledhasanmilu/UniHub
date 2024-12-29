@@ -30,7 +30,7 @@ We are a team of passionate developers dedicated to creating something extraordi
 ### Installation Steps  
 1. Clone the repository:  
    ```bash
-   git clone https://github.com/your-username/UniHub.git
+   git clone https://github.com/nurul5801/UniHub.git
    cd UniHub
 
 2. Install dependencies:

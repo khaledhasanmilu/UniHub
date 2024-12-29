@@ -1,9 +1,16 @@
-import Login from './component/Login'
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import WelcomePage from './Welcome';
+import SlidingLoginRegister from './component/LoginS';
+import Dashboard from './Dashboard'; // Example dashboard component
+
 const App = () => {
   return (
-    <div className="flex justify-center items-center h-screen bg-blue-100">
-    <Login/>
-    </div>
+    <Routes>
+      <Route path="/" element={<WelcomePage />} />
+      <Route path="/login" element={<SlidingLoginRegister />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+    </Routes>
   );
 };
 
