@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ReactDropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const SlidingLoginRegister = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -20,27 +21,15 @@ const SlidingLoginRegister = () => {
 
   // Fetch university options from API
   useEffect(() => {
-    fetch('http://localhost:5000/api/unilist', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
+    axios.get('http://localhost:5000/api/university/list')
       .then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setUniversityOptions(data);
+        setUniversityOptions(response.data);
       })
       .catch((error) => {
         console.error('Error fetching universities:', error);
         alert('Failed to load universities!');
       });
   }, []);
-  
 
   // Toggle between login and registration
   const toggleForm = () => {
@@ -62,29 +51,29 @@ const SlidingLoginRegister = () => {
       email,
       password,
     };
-    console.log(email, password);
-  
-    fetch('http://localhost:5000/api/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(loginData),
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Login Response:', data);
-        if (data.success) {
-          // If token is present, the login is successful
-          localStorage.setItem('authToken', data.token); // Save token for authentication
-          navigate('/dashboard'); // Redirect to dashboard
+    
+    axios.post('http://localhost:5000/api/auth/login', loginData, { withCredentials: true })
+      .then(response => {
+        console.log('Login Response:', response.data);
+        if (response.data.success) {
+          // Store both the authToken and userImageUrl in localStorage
+          localStorage.setItem('authToken', response.data.token);
+          localStorage.setItem('userImageUrl', response.data.userImageUrl); // Assuming the image URL is returned as 'userImageUrl'
+          
+          navigate('/dashboard');
         } else {
-          console.error('Login failed:', data.message);
-          alert('Login failed: ' + data.message);
+          console.error('Login failed:', response.data.message);
+          alert('Login failed: ' + response.data.message);
         }
       })
       .catch(error => {
-        console.error('Error during login:', error);
+        if (error.response) {
+          console.error('Error during login:', error.response.data);
+          alert(`Error: ${error.response.data.message || 'Unknown error'}`);
+        } else {
+          console.error('Network error:', error.message);
+          alert('Network error occurred!');
+        }
       });
   };
   
@@ -106,26 +95,19 @@ const SlidingLoginRegister = () => {
       university: selectedUniversity,
     };
 
-    fetch('http://localhost:5000/api/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(registerData),
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Register Response:', data);
-        if (data.success) {
+    axios.post('http://localhost:5000/api/auth/register', registerData)
+      .then((response) => {
+        console.log('Register Response:', response.data);
+        if (response.data.success) {
           // If registration is successful, redirect to login page
           alert('Registration successful! Please log in.');
           toggleForm(); // Switch to login form
         } else {
-          console.error('Registration failed:', data.message);
-          alert('Registration failed: ' + data.message);
+          console.error('Registration failed:', response.data.message);
+          alert('Registration failed: ' + response.data.message);
         }
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error during registration:', error);
         alert('An error occurred during registration!');
       });
