@@ -56,10 +56,10 @@ const SlidingLoginRegister = () => {
       .then(response => {
         console.log('Login Response:', response.data);
         if (response.data.success) {
-          // Store both the authToken and userImageUrl in localStorage
-          localStorage.setItem('authToken', response.data.token);
-          localStorage.setItem('userImageUrl', response.data.userImageUrl); // Assuming the image URL is returned as 'userImageUrl'
           
+          // Store both the authToken and userImageUrl in localStorage
+          localStorage.setItem('userImageUrl', response.data.userImageUrl); // Assuming the image URL is returned as 'userImageUrl'
+          localStorage.setItem('university', response.data.university); // Assuming the university ID is returned as 'university'
           navigate('/dashboard');
         } else {
           console.error('Login failed:', response.data.message);

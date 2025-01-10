@@ -52,14 +52,14 @@ exports.loginUser = (req, res) => {
         sameSite: 'strict',
       });
 
-      res.cookie('uid', user.id, {
+      res.cookie('uid', user.user_id, {
         httpOnly: false,
         secure: process.env.NODE_ENV === 'production',
         maxAge: 7*24*60 * 60 * 1000, 
         sameSite: 'strict',
       });
 
-      res.cookie('role', user.usertype, {
+      res.cookie('role', user.user_type, {
         httpOnly: false,
         secure: process.env.NODE_ENV === 'production',
         maxAge: 7*24*60 * 60 * 1000,
@@ -70,8 +70,9 @@ exports.loginUser = (req, res) => {
       res.status(200).json({
         success: 'Login successful',
         username: user.name,
-        role: user.usertype,
-        userImageUrl: user.userImage, // Include the image URL here
+        role: user.user_type,
+        userImageUrl: user.profile_picture, // Include the image URL here
+        university: user.university_id, // Include the university ID here
       });
     });
   });

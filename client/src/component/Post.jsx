@@ -1,11 +1,12 @@
-// src/component/Post.jsx
 import React, { useState } from 'react';
 import Comment from './Comment';  // Import the Comment component
-
-const Post = ({ userName, time, content, image, userImage }) => {
-  // State for like functionality
-  const [likes, setLikes] = useState(0);
-  const [liked, setLiked] = useState(false);
+import Cookies from 'js-cookie';
+import axios from 'axios';
+import moment from 'moment';
+const Post = ({ userName, time, content, image, userImage, likes ,postId,userId,userLiked,comment}) => {
+  // State for like functionality, initialized with the value passed as props
+  const [like, setLike] = useState(Number(likes) || 0); // Ensure likes is a number
+  const [liked, setLiked] = useState(userLiked|false);
 
   // State for comment functionality
   const [comments, setComments] = useState([]);
@@ -15,16 +16,26 @@ const Post = ({ userName, time, content, image, userImage }) => {
   // Handle like button click
   const handleLike = () => {
     setLiked(!liked);
-    setLikes(liked ? likes - 1 : likes + 1); // Toggle like count
+    console.log(postId,userId);
+    axios.post(`http://localhost:5000/api/post/updateLike`, { postId: postId, userId: userId ,liked:liked})
+      .then(response => {{ liked: !liked }
+        setLike(response.data.likes); // Update like count after successful API call
+      })
+      .catch(error => {
+        console.error('Error liking post', error);
+      });
   };
 
   // Handle adding a new comment
   const handleAddComment = () => {
+    const cookieUsername = Cookies.get('username');
+    const uid = Cookies.get('uid');
+    const storedProfileImage = localStorage.getItem('userImageUrl');
     if (commentInput) {
       const newComment = {
-        username: 'CurrentUser',  // Replace with actual username
+        username: cookieUsername,  // Replace with actual username
         content: commentInput,
-        userImage: 'https://via.placeholder.com/40', // Add user image for the comment
+        userImage: storedProfileImage|'https://via.placeholder.com/40', // Add user image for the comment
         replies: [],
         index: comments.length // Track index for reply purposes
       };
@@ -55,7 +66,7 @@ const Post = ({ userName, time, content, image, userImage }) => {
         />
         <div>
           <div className="text-xl font-semibold">{userName}</div>
-          <div className="text-gray-500 text-sm">{time}</div>
+          <div className="text-gray-500 text-sm">{moment.utc(time).local().fromNow()}</div>
         </div>
       </div>
       
@@ -73,7 +84,7 @@ const Post = ({ userName, time, content, image, userImage }) => {
           onClick={handleLike}
           className={`text-blue-500 ${liked ? 'font-bold' : ''}`}
         >
-          {liked ? 'Unlike' : 'Like'} ({likes})
+          {liked ? 'Unlike' : 'Like'} ({like})
         </button>
 
         {/* Comment Button */}
@@ -81,7 +92,7 @@ const Post = ({ userName, time, content, image, userImage }) => {
           onClick={() => setShowComments(!showComments)} // Toggle comment section visibility
           className="text-blue-500"
         >
-          {showComments ? 'Hide Comments' : 'Comment'} ({comments.length})
+          {showComments ? 'Hide Comments' : 'Comment'} ({comment})
         </button>
       </div>
 

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import Post from './component/Post';
-import moment from 'moment';
 import Navbar from './component/Navbar';
 import Sidebar from './component/Sidebar';
 import CreatePost from './component/CreatePost';
@@ -52,6 +51,7 @@ const ProfilePage = () => {
       const response = await axios.get(`http://localhost:5000/api/post/${userid}`);
       if (response.data.success) {
         setPosts(response.data.posts);
+        console.log(response.data.posts);
       }
     } catch (error) {
       console.error('Error fetching posts:', error);
@@ -169,11 +169,16 @@ const ProfilePage = () => {
               posts.map((post) => (
                 <Post
                   key={post.PostID}
-                  userName={post.name}
-                  time={moment(post.createdAt).fromNow()}
-                  content={post.Content}
-                  image={post.ImageURL}
-                  userImage={post.userImage || 'https://via.placeholder.com/40'}
+                  userName={post.creator_name}
+                  time={post.created_at}
+                  likes={post.like_count}
+                  comment={post.comment_count}
+                  content={post.content}
+                  image={post.imageUrl}
+                  userImage={post.profile_picture || 'https://via.placeholder.com/40'}
+                  postId={post.post_id}
+                  userId={userid}
+                  userLiked={(post.user_liked===1)?true:false}
                 />
               ))
             ) : (
