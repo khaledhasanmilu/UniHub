@@ -5,6 +5,7 @@ const db = require('../config/db');
 
 exports.registerUser = (req, res) => {
   const { name, email, userType, password, university } = req.body;
+  console.log(name, email, userType, password, university);
   if (!name || !email || !userType || !password || !university) {
     return res.status(400).json({ message: 'All fields are required.' });
   }
@@ -12,7 +13,8 @@ exports.registerUser = (req, res) => {
   bcrypt.hash(password, 10, (err, hashedPassword) => {
     if (err) return res.status(500).json({ message: 'Error hashing password' });
 
-    const query = 'INSERT INTO users (name, email, usertype, password, university) VALUES (?, ?, ?, ?, ?)';
+    // Use underscore for column names
+    const query = 'INSERT INTO users (name, email, user_type, password, university_id) VALUES (?, ?, ?, ?, ?)';
     db.execute(query, [name, email, userType, hashedPassword, university], (err) => {
       if (err) return res.status(500).json({ message: 'Failed to register user' });
       res.status(201).json({ success: 'User registered successfully!' });

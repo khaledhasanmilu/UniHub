@@ -85,21 +85,20 @@ const SlidingLoginRegister = () => {
       alert("Passwords don't match!");
       return;
     }
-
+  
     const registerData = {
       name,
       email,
       password,
       confirmPassword,
       userType,
-      university: selectedUniversity,
+      university: selectedUniversity, // University ID here
     };
-
+  console.log('Register Data:', registerData);
     axios.post('http://localhost:5000/api/auth/register', registerData)
       .then((response) => {
         console.log('Register Response:', response.data);
         if (response.data.success) {
-          // If registration is successful, redirect to login page
           alert('Registration successful! Please log in.');
           toggleForm(); // Switch to login form
         } else {
@@ -112,6 +111,8 @@ const SlidingLoginRegister = () => {
         alert('An error occurred during registration!');
       });
   };
+  
+  
 
   // Handle user type change
   const handleUserTypeChange = (e) => {
@@ -200,15 +201,20 @@ const SlidingLoginRegister = () => {
               />
               
               {/* University Dropdown */}
-              {(userType === 'Student' || userType === 'Alumni') && (
-                <ReactDropdown
-                  options={universityOptions.map((uni) => ({ value: uni.name, label: uni.name }))}
-                  onChange={(selectedOption) => setSelectedUniversity(selectedOption.value)}
-                  value={selectedUniversity}
-                  placeholder="Select University"
-                  className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-300"
-                />
-              )}
+              {/* University Dropdown */}
+{(userType === 'Student' || userType === 'Alumni') && (
+  <ReactDropdown
+    options={universityOptions.map((uni) => ({
+      value: uni.id, // This should be the university ID
+      label: uni.name, // This is the university name
+    }))}
+    onChange={(selectedOption) => setSelectedUniversity(selectedOption.value)} // This will set the university ID
+    value={selectedUniversity} // This will bind the selected university ID
+    placeholder="Select University"
+    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-300"
+  />
+)}
+
 
               <input
                 type="password"

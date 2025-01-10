@@ -45,9 +45,14 @@ const CreatePost = ({ onCreatePost }) => {
         const currentTime = moment().fromNow();
         const formData = new FormData();
 
+        // Ensure uid is a valid number before appending to the FormData
+        if (!uid || isNaN(uid)) {
+            alert('Invalid user ID');
+            return;
+        }
+
         formData.append('content', content);
-        formData.append('userId', uid);
-        formData.append('time', currentTime);
+        formData.append('creator_id', parseInt(uid)); // Ensure creator_id is an integer
         if (image) {
             formData.append('image', image);
         }
@@ -60,16 +65,20 @@ const CreatePost = ({ onCreatePost }) => {
             });
 
             console.log('Post created:', response.data);
-            const userImageUrl = localStorage.getItem('userImageUrl'); // Retrieve user image from localStorage
 
-            onCreatePost({
+            // Assuming imageUrl is part of the response data
+            const newPost = {
                 userName: username,
                 time: currentTime,
                 content: response.data.content,
-                image: response.data.imageUrl,
-                userImage: userImageUrl || './img/post/student.jpg', // Use the stored image URL or fallback
-            });
+                image: response.data.imageUrl, // Use the image URL from the response
+                userImage: userImage || './img/post/student.jpg', // Use the stored image URL or fallback
+            };
 
+            // Call the parent component's callback to update the posts
+            onCreatePost(newPost);
+
+            // Reset the form fields
             setContent('');
             setImage(null);
         } catch (error) {
