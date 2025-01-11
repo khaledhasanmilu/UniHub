@@ -8,5 +8,6 @@ const router = express.Router();
 router.post('/createPost', upload.single('image'), postController.createPost);
 router.get('/:userId', postController.getPostsByUserId);
 router.post('/updateLike', postController.updateLike);
+router.post('/addComment', postController.addComment);
 router.post('/uniPost', postController.getUniPosts);
 module.exports = router;

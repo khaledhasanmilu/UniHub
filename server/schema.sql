@@ -32,9 +32,13 @@ CREATE TABLE events (
     description TEXT,
     event_type ENUM('intra-university', 'inter-university') NOT NULL,
     start_time DATETIME NOT NULL,
+    imageUrl VARCHAR(200),
+    venue VARCHAR(255),
+    university INT,
     end_time DATETIME NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (university) REFERENCES universities(university_id) ON DELETE SET NULL,
     FOREIGN KEY (creator_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 

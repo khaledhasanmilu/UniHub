@@ -6,14 +6,29 @@ const db = require('../config/db');
 exports.registerUser = (req, res) => {
   const { name, email, userType, password, university } = req.body;
   console.log(name, email, userType, password, university);
-  if (!name || !email || !userType || !password || !university) {
+  if (!name || !email || !userType || !password) {
     return res.status(400).json({ message: 'All fields are required.' });
+  }
+
+  if(userType !== 'Student' && userType !== 'Alumni' && userType !== 'Industry'){
+    return res.status(400).json({ message: 'Invalid user type.' });
+  }
+  if(userType === 'Student'|| userType==='Alumni' && !university){
+    return res.status(400).json({ message: 'University ID is required for students and Alunmi.' });
   }
 
   bcrypt.hash(password, 10, (err, hashedPassword) => {
     if (err) return res.status(500).json({ message: 'Error hashing password' });
 
-    // Use underscore for column names
+    if(userType === 'Industry'){
+      const query = 'INSERT INTO users (name, email, user_type, password) VALUES (?, ?, ?, ?)';
+      db.execute(query, [name, email, userType, hashedPassword], (err) => {
+        if (err) return res.status(500).json({ message: 'Failed to register user' });
+        res.status(201).json({ success: 'User registered successfully!' });
+      });
+      return;
+    }
+    
     const query = 'INSERT INTO users (name, email, user_type, password, university_id) VALUES (?, ?, ?, ?, ?)';
     db.execute(query, [name, email, userType, hashedPassword, university], (err) => {
       if (err) return res.status(500).json({ message: 'Failed to register user' });

@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import axios from 'axios';
-import Post from './component/Post';
-import Navbar from './component/Navbar';
-import Sidebar from './component/Sidebar';
-import CreatePost from './component/CreatePost';
+import Post from '../component/Post';
+import CreatePost from '../component/CreatePost';
+import { Helmet } from 'react-helmet';
 
 const ProfilePage = () => {
   const [username, setUsername] = useState('');
@@ -128,12 +127,13 @@ const ProfilePage = () => {
 
   return (
     <div className="min-h-screen flex bg-gray-100">
+      <Helmet>
+        <title>UniHub - Profile</title>
+      </Helmet>
       {/* Sidebar Section */}
-      <Sidebar />
       {/* Main Content Section */}
       <div className="flex-1 ">
-        {/* Full-width Navbar */}
-        <Navbar />
+     
 
         <div className="bg-white shadow-md rounded-md max-w-4xl mx-80 w-full p-16">
           {/* Profile Header */}

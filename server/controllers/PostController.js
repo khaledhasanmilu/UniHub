@@ -1,6 +1,5 @@
 const path = require("path");
 const db = require("../config/db");
-const { console } = require("inspector");
 
 // Handle creating a post
 const createPost = (req, res) => {
@@ -37,7 +36,6 @@ const createPost = (req, res) => {
 // Fetch posts by creator_id
 const getPostsByUserId = (req, res) => {
   const { userId } = req.params; // Get creator_id from URL parameters
-  console.log(req.params);
 
   // SQL query to fetch posts by creator_id, including the user name and profile picture
   const query = `SELECT 
@@ -47,7 +45,7 @@ const getPostsByUserId = (req, res) => {
     posts.created_at, 
     users.name AS creator_name, 
     users.profile_picture, 
-    COUNT(DISTINCT likes.post_id) AS like_count,
+    COUNT(DISTINCT likes.like_id) AS like_count,
     COUNT(DISTINCT CASE WHEN likes.user_id = ? THEN 1 ELSE NULL END) AS user_liked,
     COUNT(DISTINCT comments.comment_id) AS comment_count
 FROM posts
@@ -81,7 +79,7 @@ const updateLike = (req, res) => {
   const { postId, userId, liked } = req.body;
   console.log(postId, userId, liked);
 
-  if (liked) {
+  if (!liked) {
     // If the user is unliking, delete the like
     const query = "DELETE FROM likes WHERE post_id = ? AND user_id = ?";
     db.execute(query, [postId, userId], (err, result) => {
@@ -128,29 +126,28 @@ const updateLike = (req, res) => {
 
 
 const getUniPosts = (req, res) => {
-  const { userId, universityId } = req.body;
-  console.log(userId, universityId);
+  const { user_id, university } = req.body;
   const query = `
     SELECT 
-      posts.post_id, 
-      posts.content,
-      posts.imageUrl, 
-      posts.created_at, 
-      users.name AS creator_name, 
-      users.profile_picture, 
-      COUNT(DISTINCT likes.post_id) AS like_count,
-      COUNT(DISTINCT CASE WHEN likes.user_id = ? THEN 1 ELSE NULL END) AS user_liked,
-      COUNT(DISTINCT comments.comment_id) AS comment_count
-    FROM posts
-    JOIN users ON posts.creator_id = users.user_id
-    LEFT JOIN likes ON posts.post_id = likes.post_id
-    LEFT JOIN comments ON posts.post_id = comments.post_id
-    WHERE posts.creator_id = ? OR users.university_id = ?
-    GROUP BY posts.post_id, posts.content, posts.created_at, users.name, users.profile_picture
-    ORDER BY posts.created_at DESC;
+    posts.post_id, 
+    posts.content,
+    posts.imageUrl, 
+    posts.created_at, 
+    users.name AS creator_name, 
+    users.profile_picture, 
+    COUNT(DISTINCT likes.like_id) AS like_count, -- Count all likes for the post
+    COUNT(DISTINCT CASE WHEN likes.user_id = ? THEN likes.like_id ELSE NULL END) AS user_liked, -- Check if user with ID 4 liked the post
+    COUNT(DISTINCT comments.comment_id) AS comment_count -- Count all comments for the post
+FROM posts
+JOIN users ON posts.creator_id = users.user_id
+LEFT JOIN likes ON posts.post_id = likes.post_id
+LEFT JOIN comments ON posts.post_id = comments.post_id
+WHERE posts.creator_id = ? OR users.university_id = ?
+GROUP BY posts.post_id, posts.content, posts.imageUrl, posts.created_at, users.name, users.profile_picture
+ORDER BY posts.created_at DESC;
   `;
 
-  db.query(query, [5,5, 1], (err, result) => {
+  db.query(query, [user_id,user_id, university], (err, result) => {
     if (err) {
       console.error("Error fetching posts:", err);
       return res.status(500).json({ message: "Error fetching posts" });
@@ -160,11 +157,27 @@ const getUniPosts = (req, res) => {
       console.log("No posts found for the given criteria.");
       return res.status(404).json({ message: "No posts found" });
     }
-
-    console.log("Query Result:", result);
     res.status(200).json({
       success: true,
       posts: result,
+    });
+  });
+};
+
+const addComment = (req, res) => {
+  const { postId, userId, content } = req.body;
+
+  const query = "INSERT INTO comments (post_id, user_id, content) VALUES (?, ?, ?)";
+  db.execute(query, [postId, userId, content], (err, result) => {
+    if (err) {
+      console.error("Error saving comment to database:", err.message);
+      return res.status(500).json({ message: "Error saving comment", error: err.message });
+    }
+
+    res.status(201).json({
+      message: "Comment added successfully",
+      commentId: result.insertId,
+      content,
     });
   });
 };
@@ -173,5 +186,6 @@ module.exports = {
   createPost,
   getPostsByUserId,
   updateLike,
-  getUniPosts
+  getUniPosts,
+  addComment
 };

@@ -5,7 +5,8 @@ const db = require('./config/db');
 const cookieParser = require('cookie-parser')
 const authRoutes = require('./routes/auth');
 const universityRoutes = require('./routes/university');
-const postRoutes = require('./routes/postRouts')
+const postRoutes = require('./routes/postRouts');
+const eventRoutes = require('./routes/event');
 const app = express();
 const PORT = 5000;
 
@@ -36,7 +37,7 @@ db.execute('SELECT 1', (err) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/university', universityRoutes);
 app.use('/api/post',postRoutes);
-
+app.use('/api/event', eventRoutes);
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Something went wrong!' });

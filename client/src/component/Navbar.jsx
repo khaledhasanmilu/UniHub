@@ -23,7 +23,7 @@ const Navbar = () => {
           // Clear the stored token in localStorage (if it's still there)
           localStorage.removeItem('authToken');
           // Redirect to login page or home page
-          navigate('/');
+          navigate('/login');
         } else {
           alert('Logout failed: ' + data.message);
         }

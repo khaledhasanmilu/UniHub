@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';   // Import Axios
-import Sidebar from './component/Sidebar';   // Sidebar component
-import Navbar from './component/Navbar';     // Navbar component
-import Post from './component/Post';         // Post component
-import CreatePost from './component/CreatePost';
+import Post from '../component/Post';         // Post component
+import CreatePost from '../component/CreatePost';
 import Cookies from 'js-cookie';
-
+import {Helmet} from "react-helmet";
 const Dashboard = () => {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -47,16 +45,16 @@ const Dashboard = () => {
 
     return (
         <div className="min-h-screen flex bg-gray-100">
-            {/* Sidebar Section */}
-            <Sidebar />
+            <Helmet>
+                <title>UniHub</title>
+            </Helmet>
+           
 
             {/* Main Content Section */}
             <div className="flex-1">
-                {/* Full-width Navbar */}
-                <Navbar />
 
                 {/* Main Feed Area */}
-                <div className="p-6">
+                <div className="p-2">
                     {/* Centered Feed */}
                     <div className="max-w-4xl mx-auto">
                         {/* Create Post Section */}

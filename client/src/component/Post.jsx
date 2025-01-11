@@ -1,135 +1,134 @@
 import React, { useState } from 'react';
-import Comment from './Comment';  // Import the Comment component
+import Comment from './Comment';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import moment from 'moment';
-const Post = ({ userName, time, content, image, userImage, likes ,postId,userId,userLiked,comment}) => {
-  // State for like functionality, initialized with the value passed as props
-  const [like, setLike] = useState(Number(likes) || 0); // Ensure likes is a number
-  const [liked, setLiked] = useState(userLiked|false);
 
-  // State for comment functionality
+const Post = ({ userName, time, content, image, userImage, likes, postId, userId, userLiked, comment }) => {
+  const [like, setLike] = useState(Number(likes) || 0);
+  const [liked, setLiked] = useState(!!userLiked);
+
   const [comments, setComments] = useState([]);
-  const [showComments, setShowComments] = useState(false); // State for toggling comment section visibility
-  const [commentInput, setCommentInput] = useState(''); // State for handling new comment input
+  const [showComments, setShowComments] = useState(false);
+  const [commentInput, setCommentInput] = useState('');
 
-  // Handle like button click
-  const handleLike = () => {
-    setLiked(!liked);
-    console.log(postId,userId);
-    axios.post(`http://localhost:5000/api/post/updateLike`, { postId: postId, userId: userId ,liked:liked})
-      .then(response => {{ liked: !liked }
-        setLike(response.data.likes); // Update like count after successful API call
-      })
-      .catch(error => {
-        console.error('Error liking post', error);
+  const handleLike = async () => {
+    const originalLiked = liked;
+    const originalLikeCount = like;
+
+    setLiked(!originalLiked);
+    setLike(originalLiked ? like - 1 : like + 1);
+
+    try {
+      await axios.post('http://localhost:5000/api/post/updateLike', {
+        postId,
+        userId,
+        liked: !originalLiked,
       });
+    } catch (error) {
+      console.error('Error updating like status:', error);
+      setLiked(originalLiked);
+      setLike(originalLikeCount);
+    }
   };
 
-  // Handle adding a new comment
-  const handleAddComment = () => {
+  const handleAddComment = async () => {
     const cookieUsername = Cookies.get('username');
     const uid = Cookies.get('uid');
     const storedProfileImage = localStorage.getItem('userImageUrl');
-    if (commentInput) {
-      const newComment = {
-        username: cookieUsername,  // Replace with actual username
+    console.log('storedProfileImage:', storedProfileImage);
+  
+    if (commentInput.trim()) {
+      // Create a temporary comment to show in the UI
+      const tempComment = {
+        username: cookieUsername,
         content: commentInput,
-        userImage: storedProfileImage|'https://via.placeholder.com/40', // Add user image for the comment
+        userImage: storedProfileImage,
         replies: [],
-        index: comments.length // Track index for reply purposes
+        isTemporary: true, // Mark it as temporary
       };
-      setComments([...comments, newComment]);
+  
+      // Add the temporary comment to the state
+      const originalComments = [...comments];
+      const updatedComments = [...comments, tempComment];
+      setComments(updatedComments);
+  
+      try {
+        // Make the API request to add the comment
+        const response = await axios.post('http://localhost:5000/api/post/addComment', {
+          postId,
+          userId: uid,
+          content: commentInput,
+          userImage: storedProfileImage,
+          username: cookieUsername,
+        });
+  
+        // Replace the temporary comment with the actual comment from the response
+        setComments([...originalComments, response.data]);
+      } catch (error) {
+        console.error('Error adding comment:', error);
+  
+        // Rollback: Remove the temporary comment
+        setComments(originalComments);
+      }
+  
+      // Clear the comment input
       setCommentInput('');
     }
   };
 
-  // Handle adding a reply to a comment
-  const handleAddReply = (commentIndex, replyContent) => {
-    const updatedComments = [...comments];
-    updatedComments[commentIndex].replies.push({
-      username: 'CurrentUser',  // Replace with actual username
-      content: replyContent,
-      userImage: 'https://via.placeholder.com/40', // Add user image for the reply
-    });
-    setComments(updatedComments);
-  };
-
   return (
     <div className="bg-white shadow-md p-6 mb-6 rounded-md max-w-xl mx-auto">
+      {/* Post Header */}
       <div className="flex items-center mb-4">
-        {/* User Image */}
-        <img 
-          src={userImage} 
-          alt="User" 
-          className="w-12 h-12 rounded-full mr-4" 
-        />
+        <img src={userImage} alt={`${userName}'s profile`} className="w-12 h-12 rounded-full mr-4" />
         <div>
           <div className="text-xl font-semibold">{userName}</div>
           <div className="text-gray-500 text-sm">{moment.utc(time).local().fromNow()}</div>
         </div>
       </div>
-      
-      <div className="mb-4">
-        <p>{content}</p>
-      </div>
-      
-      {/* Post Image */}
-      {image && <img src={image} alt="Post image" className="w-full h-64 object-cover rounded-md" />}
-      
-      {/* Actions: Like and Comment */}
+
+      {/* Post Content */}
+      <p className="mb-4">{content}</p>
+      {image && <img src={image} alt="Post" className="w-full h-64 object-cover rounded-md" />}
+
+      {/* Actions */}
       <div className="flex justify-between items-center mt-4">
-        {/* Like Button */}
-        <button 
+        <button
           onClick={handleLike}
           className={`text-blue-500 ${liked ? 'font-bold' : ''}`}
+          aria-label={liked ? 'Unlike this post' : 'Like this post'}
         >
           {liked ? 'Unlike' : 'Like'} ({like})
         </button>
-
-        {/* Comment Button */}
-        <button 
-          onClick={() => setShowComments(!showComments)} // Toggle comment section visibility
+        <button
+          onClick={() => setShowComments(!showComments)}
           className="text-blue-500"
+          aria-label="Toggle comment section"
         >
           {showComments ? 'Hide Comments' : 'Comment'} ({comment})
         </button>
       </div>
 
-      {/* Conditionally render the comment section */}
+      {/* Comments Section */}
       {showComments && (
         <div className="mt-4">
-          {comments.length > 0 && (
-            <div>
-              <h4 className="font-semibold text-lg">Comments</h4>
-              <ul className="mt-2">
-                {comments.map((comment, index) => (
-                  <li key={index}>
-                    <Comment 
-                      commentData={comment} 
-                      onAddReply={handleAddReply} 
-                    />
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Add Comment */}
-          <div className="mt-4">
-            <input 
-              type="text" 
-              placeholder="Add a comment..." 
-              value={commentInput}
-              onChange={(e) => setCommentInput(e.target.value)}
-              className="w-full p-2 border rounded-md"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  handleAddComment();
-                }
-              }}
-            />
-          </div>
+          <h4 className="font-semibold text-lg">Comments</h4>
+          <ul className="mt-2">
+            {comments.map((comment, index) => (
+              <li key={index}>
+                <Comment commentData={{ ...comment, replies: comment.replies || [] }} onAddReply={handleAddReply} />
+              </li>
+            ))}
+          </ul>
+          <input
+            type="text"
+            placeholder="Add a comment..."
+            value={commentInput}
+            onChange={(e) => setCommentInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleAddComment()}
+            className="w-full p-2 border rounded-md mt-4"
+          />
         </div>
       )}
     </div>
