@@ -1,9 +1,38 @@
-import Login from './component/Login'
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import WelcomePage from './pages/Welcome';
+import SlidingLoginRegister from './component/LoginS';
+import Dashboard from './pages/Dashboard'; // Example dashboard component
+import ProfilePage from './pages/ProfilePage';
+import Massege from './pages/Massege';
+import PostsPage from './pages/PostsPage';
+import Structure from './pages/Structure';
+import Feed from './pages/Feed';
+import QuestionBank from './pages/QuestionBank';
+import GroupMate from './pages/GroupMate';
+import Event from './pages/Event';
+import Research from './pages/Research';
+import UserProfile from './pages/UserProfile';
 const App = () => {
   return (
-    <div className="flex justify-center items-center h-screen bg-blue-100">
-    <Login/>
-    </div>
+    <Routes>
+      <Route path="/login" element={<WelcomePage />} />     
+      <Route path="/" element={<Structure />}>
+
+        {/* Nested routes rendered inside <Outlet> */}
+        <Route index element={<PostsPage />} />
+        <Route path="profile" element={<ProfilePage />} />
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="messages" element={<Massege />} />
+        <Route path="feed" element={<Feed/>} />
+        <Route path="questionBank" element={<QuestionBank />} />
+        <Route path="findGroupmate" element={<GroupMate />} />
+        <Route path="events" element={<Event/>} />
+        <Route path="research" element={<Research/>} />
+         <Route path="user/:id" element={<UserProfile/>} /> 
+      </Route>
+     
+    </Routes>
   );
 };
 
