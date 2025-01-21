@@ -13,6 +13,10 @@ import GroupMate from './pages/GroupMate';
 import Event from './pages/Event';
 import Research from './pages/Research';
 import UserProfile from './pages/UserProfile';
+import AlumniNet from './pages/AlumniNet';
+import Jobs from './pages/Jobs';
+import Application from './pages/Application';
+
 const App = () => {
   return (
     <Routes>
@@ -30,6 +34,9 @@ const App = () => {
         <Route path="events" element={<Event/>} />
         <Route path="research" element={<Research/>} />
          <Route path="user/:id" element={<UserProfile/>} /> 
+         <Route path='alumninet' element={<AlumniNet/>}/>
+         <Route path='jobs' element={<Jobs/>}/>
+         <Route path='applications' element={<Application/>}/>
       </Route>
      
     </Routes>

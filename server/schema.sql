@@ -76,16 +76,20 @@ CREATE TABLE comments (
 
 -- Create `jobs` table
 CREATE TABLE jobs (
-    job_id INT AUTO_INCREMENT PRIMARY KEY,
-    posted_by INT NOT NULL,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
+    company VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
-    location VARCHAR(255),
-    salary VARCHAR(100),
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (posted_by) REFERENCES users(user_id) ON DELETE CASCADE
+    job_type ENUM('Full-Time', 'Part-Time', 'Internship', 'Contract') NOT NULL DEFAULT 'Full-Time',
+    expected_salary VARCHAR(50) NOT NULL,
+    application_deadline DATE NOT NULL,
+    required_skills TEXT NOT NULL,
+    image_url VARCHAR(255) DEFAULT NULL,
+    creator_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (creator_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
+
 
 -- Create `research_papers` table
 CREATE TABLE research_papers (

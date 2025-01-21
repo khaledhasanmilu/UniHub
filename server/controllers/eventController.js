@@ -73,24 +73,32 @@ exports.getEvents = async (req, res) => {
 exports.updateEvent = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, date, time, location, imageUrl } = req.body;
-    const event = await Event.findByPk(id);
-    if (!event) {
-      return res.status(404).json({
-        success: false,
-        message: 'Event not found',
+    const { title, description, startDate, endDate, venue, type } = req.body;
+    const imageUrl = req.file
+      ? `http://localhost:5000/uploads/images/${req.file.filename}`
+      : null;
+
+    const query = 'UPDATE events SET title = ?, description = ?, start_time = ?, end_time = ?, venue = ?, imageUrl = ?, event_type = ? WHERE id = ?;';
+    db.execute(query, [title, description, startDate, endDate, venue, imageUrl, type, id], (err, result) => {
+      if (err) {
+        console.error('Error updating event:', err.message);
+        return res.status(500).json({
+          success: false,
+          message: 'Internal server error',
+        });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'Event not found',
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: 'Event updated successfully',
       });
-    }
-    event.title = title;
-    event.description = description;
-    event.date = date;
-    event.time = time;
-    event.location = location;
-    event.imageUrl = imageUrl;
-    await event.save();
-    res.status(200).json({
-      success: true,
-      event,
     });
   } catch (error) {
     console.error('Error updating event:', error);
@@ -99,7 +107,8 @@ exports.updateEvent = async (req, res) => {
       message: 'Internal server error',
     });
   }
-}
+  }
+
 
 exports.deleteEvent = async (req, res) => { 
   try {
