@@ -144,15 +144,7 @@ const Sidebar = () => {
                   <span>Applications</span>
                 </button>
               </li>
-              <li>
-                <button
-                  onClick={() => navigate('/messages')}
-                  className="w-full text-left flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-700 active:bg-gray-600 transition duration-200"
-                >
-                  <FontAwesomeIcon icon={faComment} className="h-5 w-5" />
-                  <span>Messages</span>
-                </button>
-              </li>
+              
             </>
           )}
         </ul>

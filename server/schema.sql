@@ -90,6 +90,20 @@ CREATE TABLE jobs (
     FOREIGN KEY (creator_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
+-- Create `applications` table
+CREATE TABLE applications (
+    application_id INT AUTO_INCREMENT PRIMARY KEY,
+    job_id INT,
+    applicant_name VARCHAR(255) NOT NULL,
+    applicant_email VARCHAR(255) NOT NULL,
+    resume_url VARCHAR(255) NOT NULL,
+    cover_letter TEXT,
+    application_status ENUM('Pending', 'Reviewed', 'Accepted', 'Rejected') NOT NULL DEFAULT 'Pending',
+    applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE
+);
+
 
 -- Create `research_papers` table
 CREATE TABLE research_papers (

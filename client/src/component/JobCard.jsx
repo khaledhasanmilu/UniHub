@@ -10,7 +10,8 @@ import {
   FaTrash,
 } from "react-icons/fa";
 import Cookies from "js-cookie";
-
+import { useNavigate } from 'react-router-dom';  // Import useNavigate for React Router v6
+import moment from "moment";
 const JobCard = ({ job, onUpdateJob, onDeleteJob }) => {
   const [showDetails, setShowDetails] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
@@ -19,14 +20,17 @@ const JobCard = ({ job, onUpdateJob, onDeleteJob }) => {
   const [isDeleting, setIsDeleting] = useState(false); // State to manage delete button status
   const role = Cookies.get("role");
 
+  const navigate = useNavigate();  // Initialize useNavigate
+
   const handleEditJob = () => {
     setShowPopup(true); // Show the popup when "Edit Job" is clicked
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    setNewJob({ ...newJob, image_url: URL.createObjectURL(file) });
+    setNewJob({ ...newJob, image: file }); // Store the file itself
   };
+  
 
   const handleUpdateJob = (e) => {
     e.preventDefault();
@@ -47,6 +51,11 @@ const JobCard = ({ job, onUpdateJob, onDeleteJob }) => {
       onDeleteJob(job.id); // Pass the job ID to the parent function for deletion
       setIsDeleting(false);
     }
+  };
+
+  const handleApplyNow = () => {
+    // Redirect to the job application page with the job ID
+    navigate(`/jobapply/${job.id}`);  // Redirect to '/jobapply/{jobId}'
   };
 
   return (
@@ -82,7 +91,7 @@ const JobCard = ({ job, onUpdateJob, onDeleteJob }) => {
         </p>
         <p className="flex items-center">
           <FaClock className="mr-2 text-purple-500" />
-          <span>Deadline: {job.application_deadline}</span>
+          <span>Deadline: {moment(job.application_deadline).fromNow()}</span>
         </p>
         <p className="flex items-center">
           <FaCalendarAlt className="mr-2 text-yellow-500" />
@@ -102,7 +111,7 @@ const JobCard = ({ job, onUpdateJob, onDeleteJob }) => {
       <div className="mt-4 flex gap-3">
         <button
           className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition"
-          onClick={role === "Industry" ? handleEditJob : null}
+          onClick={role === "Industry" ? handleEditJob : handleApplyNow}  // Handle Apply Now or Edit Job
         >
           {role === "Industry" ? "Edit Job" : "Apply Now"}
         </button>
