@@ -43,6 +43,7 @@ const getPostsByUserId = (req, res) => {
     posts.content,
     posts.imageUrl, 
     posts.created_at, 
+    posts.creator_id,
     users.name AS creator_name, 
     users.profile_picture, 
     COUNT(DISTINCT likes.like_id) AS like_count,
@@ -133,6 +134,7 @@ const getUniPosts = (req, res) => {
     posts.content,
     posts.imageUrl, 
     posts.created_at, 
+    posts.creator_id,
     users.name AS creator_name, 
     users.profile_picture, 
     COUNT(DISTINCT likes.like_id) AS like_count, -- Count all likes for the post

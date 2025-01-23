@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useHistory hook for navigation
 import Comment from './Comment';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import moment from 'moment';
 
 const Post = ({ userName, time, content, image, userImage, likes, postId, userId, userLiked, comment }) => {
+  const navigate = useNavigate(); // Initialize history for navigation
   const [like, setLike] = useState(Number(likes) || 0);
   const [liked, setLiked] = useState(!!userLiked);
 
@@ -77,13 +79,23 @@ const Post = ({ userName, time, content, image, userImage, likes, postId, userId
     }
   };
 
+  const handleUsernameClick = () => {
+    // Redirect to the user's profile page using their userId
+    navigate(`/user/${userId}`);
+  };
+
   return (
     <div className="bg-white shadow-md p-6 mb-6 rounded-md max-w-xl mx-auto">
       {/* Post Header */}
       <div className="flex items-center mb-4">
         <img src={userImage} alt={`${userName}'s profile`} className="w-12 h-12 rounded-full mr-4" />
         <div>
-          <div className="text-xl font-semibold">{userName}</div>
+          <div 
+            className="text-xl font-semibold cursor-pointer text-blue-500" 
+            onClick={handleUsernameClick} 
+          >
+            {userName}
+          </div>
           <div className="text-gray-500 text-sm">{moment.utc(time).local().fromNow()}</div>
         </div>
       </div>

@@ -34,7 +34,7 @@ const Event = () => {
 
 
   return (
-    <div className="min-h-screen flex bg-gray-100">
+    <div className="min-h-screen flex bg-gray-100 mx-8">
       <Helmet>
         <title>UniHub - Event</title>
       </Helmet>

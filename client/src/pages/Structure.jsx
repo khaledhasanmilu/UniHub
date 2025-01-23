@@ -28,13 +28,13 @@ const Structure = () => {
             {/* Sidebar Section */}
            
             {/* Main Content Section */}
-            <div className="flex-1">
+            <div className="flex-1 w-full">
                 {/* Full-width Navbar */}
                 <Navbar />
 
 
                 {/* Main Feed Area */}
-                <div className="p-6 space-y-6">
+                <div>
                     {/* Dynamic Content Area */}
                     <Outlet />
                 </div>

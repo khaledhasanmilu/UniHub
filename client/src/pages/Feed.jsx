@@ -88,7 +88,7 @@ const Feed = () => {
             image={post.imageUrl}
             userImage={post.profile_picture || 'https://via.placeholder.com/40'}
             postId={post.post_id}
-            userId={userid}
+            userId={post.creator_id}
             userLiked={(post.user_liked === 1) ? true : false}
             />
           ))

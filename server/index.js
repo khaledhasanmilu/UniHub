@@ -8,6 +8,7 @@ const universityRoutes = require('./routes/university');
 const postRoutes = require('./routes/postRouts');
 const eventRoutes = require('./routes/event');
 const jobRoutes = require('./routes/Job');
+const userRoutes = require('./routes/user');
 const app = express();
 const PORT = 5000;
 
@@ -40,6 +41,7 @@ app.use('/api/university', universityRoutes);
 app.use('/api/post',postRoutes);
 app.use('/api/event', eventRoutes);
 app.use('/api/job',jobRoutes);
+app.use('/api/user', userRoutes);
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Something went wrong!' });
