@@ -17,24 +17,35 @@ function ProfileCard({ id }) {
         profilePicture: '',
         twitter: '',
         linkedin: '',
-        github: ''
+        github: '',
+        skills: '',
+
     });
-    
+
     const currentUserId = Cookies.get('uid'); // Assume the current user is fetched from cookies
 
     useEffect(() => {
         fetchProfileData();
     }, [id]); // Fetch profile data when `id` changes
 
+  
+
     const fetchProfileData = async () => {
+        
         try {
-            const response = await fetch(`http://localhost:5000/api/user/details/${id}`);
-            const data = await response.json();
-            setProfile(data);
+            const response = await axios.get(`http://localhost:5000/api/user/details/${id}`, {
+                params: { currentUserId }
+            });
+            setProfile(response.data);
+            setFollowers(response.data.followers ?? 0);
+            setIsFollowing(response.data.isFollowing === 1);
+            
+    
         } catch (error) {
             console.error("Error fetching profile data:", error);
         }
     };
+    
 
     const handleFollow = async () => {
         try {
@@ -77,9 +88,9 @@ function ProfileCard({ id }) {
             // Here, send the file to your backend to save
             const formData = new FormData();
             formData.append('profilePicture', file);
-
+            formData.append('userId', id);
             try {
-                const response = await axios.post(`http://localhost:5000/api/user/upload-profile-picture/${id}`, formData, {
+                const response = await axios.post(`http://localhost:5000/api/user/upload-picture`, formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
                 if (response.status === 200) {
@@ -92,7 +103,30 @@ function ProfileCard({ id }) {
             }
         }
     };
-
+    const handleUpdateClick = async () => {
+        
+        const data = {
+            
+            userId: id,
+            degree: profile.degree,
+            graduationYear: profile.graduationYear,
+            skills: profile.skills,
+            bio: profile.bio,
+            twitter: profile.twitter,
+            linkedin: profile.linkedin,
+            github: profile.github
+            
+        };
+        try {
+            const response = await axios.post(`http://localhost:5000/api/user/updateProfile`, data);
+            if (response.status === 200) {
+                setIsEditing(false);
+            }
+        } catch (error) {
+            console.error("Error updating profile:", error);
+        }
+    }
+    
     return (
         <div>
             <div className="max-w-4xl mx-auto bg-white shadow-sm rounded-lg overflow-hidden border border-gray-200 p-6 flex items-center relative '}">
@@ -113,7 +147,8 @@ function ProfileCard({ id }) {
                 <h2 className="text-2xl font-semibold text-gray-800">{profile.name}</h2>
                 <p className="text-gray-600">{profile.degree}</p>
                 <p className="text-gray-600">University: {profile.university}</p>
-                <p className="text-gray-500">Class of {profile.graduationYear}</p>
+                <p className="text-gray-500">Class of : {profile.graduationYear}</p>
+                <p className=' text-gray-500'>Skills : {profile.skills}</p>
                 <p className="mt-4 text-gray-700">{profile.bio}</p>
                 
                 <div className="mt-4 flex space-x-4">
@@ -156,13 +191,14 @@ function ProfileCard({ id }) {
                         
                         <input type="text" name="degree" value={profile.degree} onChange={handleChange} className="w-full p-2 mb-2 border rounded" placeholder="Degree" />
                         <input type="text" name="graduationYear" value={profile.graduationYear} onChange={handleChange} className="w-full p-2 mb-2 border rounded" placeholder="Year of Graduation" />
+                        <input type="text" name="skills" value={profile.skills} onChange={handleChange} className="w-full p-2 mb-2 border rounded" placeholder="Skills" />
                         <textarea name="bio" value={profile.bio} onChange={handleChange} className="w-full p-2 mb-2 border rounded" placeholder="Bio"></textarea>
                         <input type="text" name="twitter" value={profile.twitter} onChange={handleChange} className="w-full p-2 mb-2 border rounded" placeholder="Twitter URL" />
                         <input type="text" name="linkedin" value={profile.linkedin} onChange={handleChange} className="w-full p-2 mb-2 border rounded" placeholder="LinkedIn URL" />
                         <input type="text" name="github" value={profile.github} onChange={handleChange} className="w-full p-2 mb-2 border rounded" placeholder="GitHub URL" />
                        
                         <button onClick={handleCloseEdit} className="mt-4 px-4 py-2 bg-gray-500 text-white rounded w-full">Close</button>
-                        <button className="mt-2 px-4 py-2 bg-blue-500 text-white rounded w-full">Update</button>
+                        <button onClick={handleUpdateClick} className="mt-2 px-4 py-2 bg-blue-500 text-white rounded w-full">Update</button>
                     </div>
                 </div>
             )}

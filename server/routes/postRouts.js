@@ -1,5 +1,5 @@
 const express = require('express');
-const {uploadImage} = require('../config//multer');  // Import multer configuration
+const {uploadImage} = require('../config/multer');  // Import multer configuration
 const postController = require('../controllers/PostController');
 
 const router = express.Router();
