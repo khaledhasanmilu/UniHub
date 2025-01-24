@@ -120,7 +120,7 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="min-h-screen flex bg-gray-100">
+    <div className="min-h-screen flex bg-gray-100 ">
       <Helmet>
         <title>UniHub - Profile</title>
       </Helmet>
@@ -131,7 +131,11 @@ const ProfilePage = () => {
 
         <div className="bg-white shadow-md rounded-md max-w-4xl mx-80 w-full p-16">
           {/* Profile Header */}
-          <ProfileCard id={userid}/>
+         
+         
+         <ProfileCard id={userid}/>
+       
+         
 
           
        

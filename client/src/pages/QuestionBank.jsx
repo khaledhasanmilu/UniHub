@@ -161,7 +161,7 @@ const QuestionPage = () => {
                         ) : (
                             Object.keys(groupedNotes).map(course => (
                                 <div key={course} className="mb-6">
-                                    <h2 className="text-xl font-semibold text-center text-blue-500 border-b pb-2">{course}</h2>
+                                    <h2 className="text-xl font-semibold text-center text-blue-400 border-b pb-2">{course}</h2>
                                     {groupedNotes[course].map(note => (
                                         <NoteCard 
                                             key={note.id} 

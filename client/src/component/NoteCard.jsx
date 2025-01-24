@@ -3,7 +3,7 @@ import React from 'react';
 function NoteCard({ courseCode, courseName, title, shortDescription, contentUrl, creator, createDate }) {
   console.log(courseCode, courseName, title, shortDescription, contentUrl, creator, createDate);  
   return (
-    <div className="bg-white shadow-md rounded-md p-4 border border-gray-300">
+    <div className="bg-gray-100 shadow-md rounded-md p-4 border border-gray-300">
       <h2 className="text-lg font-semibold text-blue-600">{title}</h2>
       <p className="text-sm text-gray-500">{shortDescription}</p>
 

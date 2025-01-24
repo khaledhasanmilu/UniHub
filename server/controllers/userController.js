@@ -21,6 +21,9 @@ const getUserDetails = (req,res)=>{
         SELECT COUNT(*) FROM followers WHERE followed = u.user_id
     ) AS followers,
     (
+        SELECT COUNT(*) FROM followers WHERE follower = u.user_id
+    ) AS following,
+    (
         SELECT EXISTS (
 	SELECT 1 FROM followers WHERE follower = ? AND followed = u.user_id
         )
