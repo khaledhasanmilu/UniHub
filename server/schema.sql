@@ -115,4 +115,42 @@ CREATE TABLE research_papers (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (uploaded_by) REFERENCES users(user_id) ON DELETE CASCADE
 );
+-- Create `user_profiles` table
+CREATE TABLE user_profiles (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `degree` varchar(255) DEFAULT NULL,
+  `graduation_year` int(11) DEFAULT NULL,
+  `skills` text DEFAULT NULL,
+  `bio` text DEFAULT NULL,
+  `twitter` varchar(500) DEFAULT NULL,
+  `linkedin` varchar(500) DEFAULT NULL,
+  `github` varchar(500) DEFAULT NULL,
+   PRIMARY KEY (`id`),
+   FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+-- Create `followers` table
+CREATE TABLE `followers` (
+  follower int(11) NOT NULL,
+  followed int(11) NOT NULL,
+  PRIMARY KEY (`follower`,`followed`),
+    
+  ADD CONSTRAINT `fk_fllow` FOREIGN KEY (`follower`) REFERENCES `users` (`user_id`),
+  ADD CONSTRAINT `fk_fllow2` FOREIGN KEY (`followed`) REFERENCES `users` (`user_id`);
+)
+
+
+
+CREATE TABLE notes (
+    note_id INT PRIMARY KEY AUTO_INCREMENT,
+    university_id INT,
+    creator_id INT,
+    course_code VARCHAR(50) NOT NULL,
+    course_name VARCHAR(255) NOT NULL,
+    short_description TEXT,
+    content_url VARCHAR(500), -- File URL for uploaded notes
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (university_id) REFERENCES universities(university_id) ON DELETE CASCADE,
+    FOREIGN KEY (creator_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
 

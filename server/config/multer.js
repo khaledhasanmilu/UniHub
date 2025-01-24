@@ -27,6 +27,15 @@ const resumeStorage = multer.diskStorage({
     }
 });
 
+const notesStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, path.join(__dirname, '..', 'uploads', 'notes')); // Store notes in 'uploads/notes'
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    }
+});
 /**
  * File filter for images (allow only jpg, jpeg, png)
  */
@@ -62,7 +71,22 @@ const resumeFileFilter = (req, file, cb) => {
     }
   };
   
-
+const notesFileFilter = (req, file, cb) => {
+    const fileTypes = /pdf|jpg|docx|png|doc/;
+    const extname = path.extname(file.originalname).toLowerCase();
+    const mimetype = file.mimetype;
+  
+    console.log('File Extension:', extname);
+    console.log('MIME Type:', mimetype);
+  
+    if (fileTypes.test(extname) && fileTypes.test(mimetype)) {
+      return cb(null, true);
+    } else {
+      // Pass the error message to callback
+        req.fileValidationError = 'Only PDF,JPG,PNG, DOC, and DOCX files are allowed!';
+        return cb(null, false, new Error('Only PDF, JPG,PNG,DOC, and DOCX files are allowed!'));
+    }
+  };
 /**
  * Multer upload configurations
  */
@@ -77,8 +101,14 @@ const uploadResume = multer({
     limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit for resumes
     fileFilter: resumeFileFilter
 });
+const uploadNotes = multer({
+    storage: notesStorage,
+    limits: { fileSize: 30 * 1024 * 1024 }, // 10MB limit for resumes
+    fileFilter: notesFileFilter
+});
 
 module.exports = {
     uploadImage,
-    uploadResume
+    uploadResume,
+    uploadNotes
 };
