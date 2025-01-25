@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-
+import { useNavigate } from 'react-router-dom';
 function ApplyJob() {
     const { jobId } = useParams();
     const [jobDetails, setJobDetails] = useState(null);
@@ -13,7 +13,7 @@ function ApplyJob() {
         coverLetter: '',
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
-
+    const navigate = useNavigate();
     useEffect(() => {
         axios.get(`http://localhost:5000/api/job/getJob/${jobId}`)
             .then((response) => setJobDetails(response.data))
@@ -59,6 +59,7 @@ function ApplyJob() {
                 resume: null,
                 coverLetter: '',
             });
+            navigate('/jobs');
 
         } catch (error) {
             setError(error.response?.data?.error || "Error submitting application");

@@ -37,8 +37,8 @@ const Massege = () => {
           
           const newUser = {
             id: parseInt(id),
-            name: 'New User', // Fetch user data from your API as necessary
-            image: 'https://randomuser.me/api/portraits/men/0.jpg', // Mock image for now
+            name: user.data.name||'New User', // Fetch user data from your API as necessary
+            image: user.data.profile_picture||'http://localhost:5000/uploads/images/user.png', // Mock image for now
           };
           console.log(id);
           if(id){
@@ -48,12 +48,18 @@ const Massege = () => {
             // });
             // console.log("response",response);
             usersList.unshift(newUser); // Add the new user to the top
+            console.log(newUser);
+
+            setSelectedUser(newUser); // Set as selected
+          }else{
+            setSelectedUser(usersList[0]); // Set the first user as selected
           }
            // Add the new user to the top
-          setSelectedUser(newUser); // Set as selected user
+           // Set as selected user
         }
 
         setUsers(usersList);
+        
 
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -85,9 +91,9 @@ const Massege = () => {
   });
 
   return (
-    <div className="min-h-[calc(100vh-100px)] bg-gray-100 mx-8">
+    <div className="min-h-[calc(100vh-100px)] bg-gray-100 mx-8 ">
       <div className="bg-white shadow-md rounded-md min-h-[calc(100vh-100px)] max-w-6xl w-full mx-60 p-5">
-        <div className="flex">
+        <div className="flex gap-2">
           <div className="w-[calc(100vh/2.2)] max-h-[calc(100vh-110px)] overflow-y-auto">
             {users.length > 0 && (
               <>

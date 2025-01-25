@@ -22,7 +22,7 @@ const QuestionPage = () => {
         shortDescription: "", 
         file: null,
         creatorId: "",
-        creatorName: "",
+        creator: "",
         contentUrl: "",
     });
 
@@ -151,6 +151,7 @@ const QuestionPage = () => {
                                             contentUrl={note.contentUrl}
                                             shortDescription={note.shortDescription} 
                                             creator={note.creatorName}
+                                            createId={note.creatorId}
                                             createDate={note.createDate}
                                         />
                                     ))
@@ -170,6 +171,7 @@ const QuestionPage = () => {
                                             contentUrl={note.contentUrl}
                                             shortDescription={note.shortDescription} 
                                             creator={note.creatorName}
+                                            createId={note.creatorId}
                                             createDate={note.createDate}
                                         />
                                     ))}

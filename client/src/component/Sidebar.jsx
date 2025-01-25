@@ -84,11 +84,11 @@ const Sidebar = () => {
               </li>
               <li>
                 <button
-                  onClick={() => navigate('/research')}
+                  onClick={() => navigate('/jobs')}
                   className="w-full text-left flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-700 active:bg-gray-600 transition duration-200"
                 >
-                  <FontAwesomeIcon icon={faNetworkWired} className="h-5 w-5" />
-                  <span>Research</span>
+                  <FontAwesomeIcon icon={faBriefcase} className="h-5 w-5" />
+                  <span>Jobs</span>
                 </button>
               </li>
             </>

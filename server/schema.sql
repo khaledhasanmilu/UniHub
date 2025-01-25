@@ -163,3 +163,16 @@ CREATE TABLE messages (
     FOREIGN KEY (sender_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (receiver_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
+
+CREATE TABLE requests (
+    request_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    project_name VARCHAR(255) NOT NULL,
+    course_name VARCHAR(255) NOT NULL,
+    semester VARCHAR(100) NOT NULL,
+    description TEXT NOT NULL,
+    end_time DATE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);

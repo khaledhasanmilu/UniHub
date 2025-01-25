@@ -28,7 +28,7 @@ const Structure = () => {
             {/* Sidebar Section */}
            
             {/* Main Content Section */}
-            <div className="flex-1 w-full">
+            <div className="w-full">
                 {/* Full-width Navbar */}
                 <Navbar />
 

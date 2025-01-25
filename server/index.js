@@ -12,6 +12,7 @@ const userRoutes = require('./routes/user');
 const noteRoutes = require('./routes/note');
 const alumniRoutes = require('./routes/alumni');
 const chatRoutes = require('./routes/chat');
+const teamRoutes = require('./routes/team');
 
 const app = express();
 const http = require('http');
@@ -59,7 +60,7 @@ app.use('/api/user', userRoutes);
 app.use('/api/note', noteRoutes);
 app.use('/api/alumni', alumniRoutes);
 app.use('/api/chat', chatRoutes);
-
+app.use('/api/team', teamRoutes);
 // WebSocket Events
 
 
@@ -136,6 +137,6 @@ app.use((err, req, res, next) => {
 });
 
 // Start the WebSocket-Enabled Server
-server.listen(PORT, () => {
+server.listen(PORT,() => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
