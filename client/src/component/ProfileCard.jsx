@@ -111,9 +111,11 @@ function ProfileCard({ id }) {
         if (response.status === 200) {
           setProfile({
             ...profile,
-            profilePicture: response.data.profilePictureUrl,
+            profilePicture: response.data.imageUrl,
           });
+          localStorage.setItem("userImageUrl", response.data.imageUrl);
           setIsUploading(false);
+          window.location.reload();
         }
       } catch (error) {
         console.error("Error uploading profile picture:", error);
@@ -138,6 +140,7 @@ function ProfileCard({ id }) {
         data
       );
       if (response.status === 200) {
+       
         setIsEditing(false);
       }
     } catch (error) {
@@ -146,7 +149,7 @@ function ProfileCard({ id }) {
   };
 const handleMessenger = async () => {
     console.log("Messenger with user", id);
-    navigate(`/messenger/${id}`);
+    navigate(`/messages/${id}`);
   };
 
   return (

@@ -28,6 +28,7 @@ const App = () => {
         <Route path="profile" element={<ProfilePage />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="messages" element={<Massege />} />
+        <Route path="messages/:id" element={<Massege />} />
         <Route path="feed" element={<Feed />} />
         <Route path="questionBank" element={<QuestionBank />} />
         <Route path="findGroupmate" element={<GroupMate />} />

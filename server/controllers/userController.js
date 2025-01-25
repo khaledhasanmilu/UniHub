@@ -96,7 +96,11 @@ const uploadProfilePicture = (req,res)=>{
             console.error("Error uploading profile picture:",err.message);
             return res.status(500).json({message:"Error uploading profile picture",error:err.message});
         }
-        res.status(200).json({message:"Profile picture uploaded successfully"});
+        res.status(200).json(
+            {message:"Profile picture uploaded successfully",
+            imageUrl:imageUrl
+
+        });
     });
 }
 
