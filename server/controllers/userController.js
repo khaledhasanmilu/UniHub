@@ -8,6 +8,7 @@ const getUserDetails = (req,res)=>{
     const query = `SELECT 
     u.user_id AS user_id,
     u.name AS name,
+    u.user_type AS role,
     u.profile_picture AS profilePicture,
     uni.name AS university,
     up.degree AS degree,
@@ -116,4 +117,18 @@ const updateProfile = (req,res)=>{
         res.status(200).json({message:"Profile updated successfully"});
     });
 }
-module.exports ={getUserDetails,followUser,uploadProfilePicture,updateProfile};
+
+const searchUser = (req,res)=>{
+    const query = "SELECT user_id AS userId,name,profile_picture AS profilePicture FROM users WHERE name LIKE ?";
+    console.log(req.params.query);
+    db.execute(query,[`%${req.query.query}%`],(err,result)=>{
+        if(err){
+            console.error("Error searching user:",err.message);
+            return res.status(500).json({message:"Error searching user",error:err.message});
+        }
+        res.status(200).json({users:result});
+    });
+}
+
+
+module.exports ={getUserDetails,followUser,uploadProfilePicture,updateProfile,searchUser};

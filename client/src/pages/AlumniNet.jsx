@@ -1,141 +1,131 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { FaSearch } from 'react-icons/fa'; // Import search icon from react-icons
+import React, { useState, useEffect, useMemo } from "react";
+import axios from "axios";
+import { FaSearch } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 function AlumniNet() {
-  const userUniversity = 'University of ABC'; // Replace with dynamic user university
-  const userDepartment = 'Computer Science'; // Replace with dynamic user department
-  // State to hold alumni data
+  const userUniversity = "United International University"; // Replace dynamically
+  const userDepartment = "Computer Science"; // Replace dynamically
+
   const [universityAlumni, setUniversityAlumni] = useState([]);
   const [departmentAlumni, setDepartmentAlumni] = useState([]);
-  const [filter, setFilter] = useState('university'); // 'university' or 'department'
+  const [filter, setFilter] = useState("university");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [searchQuery, setSearchQuery] = useState(''); // State for the search query
+  const [searchQuery, setSearchQuery] = useState("");
 
-  // Fetch alumni data from the backend
+  // Fetch Alumni Data
   useEffect(() => {
     const fetchAlumniData = async () => {
       setLoading(true);
       try {
-        const universityResponse = await axios.get('http://localhost:5000/api/alumni/getUniversityAlumni', {
-          withCredentials: true,
-        });
-        const departmentResponse = await axios.get('http://localhost:5000/api/alumni/getAlumni', {
-          withCredentials: true,
-        });
-        console.log(universityResponse.data);
+        const [universityResponse, departmentResponse] = await Promise.all([
+          axios.get("http://localhost:5000/api/alumni/getUniversityAlumni", { withCredentials: true }),
+          axios.get("http://localhost:5000/api/alumni/getAlumni", { withCredentials: true }),
+        ]);
+
         setUniversityAlumni(universityResponse.data);
         setDepartmentAlumni(departmentResponse.data);
       } catch (err) {
-        setError(err.message);
+        setError("Failed to load alumni data. Please try again.");
       } finally {
         setLoading(false);
       }
     };
 
     fetchAlumniData();
-  }, [userDepartment]);
+  }, []);
 
-  // Filter alumni data based on the search query
-  const filteredUniversityAlumni = universityAlumni.filter(alumnus =>
-    alumnus.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const filteredDepartmentAlumni = departmentAlumni.filter(alumnus =>
-    alumnus.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Filter Alumni with useMemo for performance
+  const filteredAlumni = useMemo(() => {
+    const list = filter === "university" ? universityAlumni : departmentAlumni;
+    return list.filter((alumnus) => alumnus.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  }, [searchQuery, filter, universityAlumni, departmentAlumni]);
 
   return (
-    <div className="min-h-screen flex bg-gray-100 mx-8 my-2">
-      <div className="flex-1">
-        <div className="bg-white shadow-md rounded-md max-w-6xl min-h-full w-full mx-60 p-8">
-          <h2 className="text-2xl text-center font-semibold mb-6">Alumni Network</h2>
+    <div className="min-h-screen bg-gray-100 flex justify-center mx-8 p-4">
+      <div className="bg-white shadow-lg rounded-lg w-full max-w-8xl ml-60 p-6">
+        <h2 className="text-3xl font-bold text-center mb-6 text-gray-700">Alumni Network</h2>
 
-          {/* Search Bar and Filter Buttons in the same line */}
-          <div className="mb-6 flex justify-between items-center">
-            <div className="relative flex-1">
-              <input
-                type="text"
-                className="px-4 py-2 w-full border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Search Alumni..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-              />
-              <FaSearch className="absolute top-2 right-3 text-gray-500" />
-            </div>
-            
-            <div>
-              {/* Filter Buttons */}
-              <button
-                onClick={() => setFilter('university')}
-                className={`px-4 py-2 mx-2 rounded-md ${filter === 'university' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-              >
-                University Alumni
-              </button>
-              <button
-                onClick={() => setFilter('department')}
-                className={`px-4 py-2 mx-2 rounded-md ${filter === 'department' ? 'bg-green-500 text-white' : 'bg-gray-200'}`}
-              >
-                Department Alumni
-              </button>
-            </div>
+        {/* Search and Filter Section */}
+        <div className="flex flex-col md:flex-row items-center gap-4 mb-6">
+          <div className="relative flex-1 w-full">
+            <input
+              type="text"
+              className="px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Search alumni by name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <FaSearch className="absolute top-2 right-4 text-gray-500" />
           </div>
 
-          {/* Loading and Error */}
-          {loading && <p className="text-center text-gray-500">Loading alumni data...</p>}
-          {error && <p className="text-center text-red-500">{error}</p>}
-
-          {/* University Community */}
-          {filter === 'university' && !loading && (
-            <div className="mb-8">
-              <h3 className="text-xl font-semibold mb-4 text-blue-700">University Community - {userUniversity}</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredUniversityAlumni.length === 0 ? (
-                  <p className="text-center text-gray-500">No alumni found from your university.</p>
-                ) : (
-                  filteredUniversityAlumni.map(alumnus => (
-                    <div key={alumnus.user_id} className="bg-gray-50 shadow-md rounded-md p-4">
-                      <h3 className="text-lg font-semibold">{alumnus.name}</h3>
-                      <p className="text-gray-500">{alumnus.degree}</p>
-                      <p className="text-sm text-gray-700">{alumnus.graduation_year}</p>
-                      <div className="mt-4">
-                        <a href={`/user/${alumnus.user_id}`} className="text-blue-500 hover:text-blue-700">
-                          View Profile
-                        </a>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Department Alumni */}
-          {filter === 'department' && !loading && (
-            <div className="mb-8">
-              <h3 className="text-xl font-semibold mb-4 text-green-700">Department Alumni - {userDepartment}</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredDepartmentAlumni.length === 0 ? (
-                  <p className="text-center text-gray-500">No alumni found from your department.</p>
-                ) : (
-                  filteredDepartmentAlumni.map(alumnus => (
-                    <div key={alumnus.user_id} className="bg-gray-50 shadow-md rounded-md p-4">
-                      <h3 className="text-lg font-semibold">{alumnus.name}</h3>
-                      <p className="text-gray-500">{alumnus.degree}</p>
-                      <p className="text-sm text-gray-700">{alumnus.graduation_year}</p>
-                      <div className="mt-4">
-                        <a href={`/user/${alumnus.user_id}`} className="text-blue-500 hover:text-blue-700">
-                          View Profile
-                        </a>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          )}
+          <div className="flex gap-2">
+            <button
+              onClick={() => setFilter("university")}
+              className={`px-4 py-2 rounded-lg transition ${
+                filter === "university" ? "bg-blue-600 text-white" : "bg-gray-200"
+              }`}
+            >
+              University Alumni
+            </button>
+            <button
+              onClick={() => setFilter("department")}
+              className={`px-4 py-2 rounded-lg transition ${
+                filter === "department" ? "bg-green-600 text-white" : "bg-gray-200"
+              }`}
+            >
+              Department Alumni
+            </button>
+          </div>
         </div>
+
+        {/* Loading & Error Handling */}
+        {loading && <p className="text-center text-gray-500">Loading alumni data...</p>}
+        {error && <p className="text-center text-red-500">{error}</p>}
+
+        {/* Alumni List */}
+        {!loading && (
+          <div>
+            <h3 className={`text-xl font-semibold mb-4 ${filter === "university" ? "text-blue-700" : "text-green-700"}`}>
+              {filter === "university" ? `University Community -` : `Department Alumni -`}
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredAlumni.length === 0 ? (
+                <p className="text-center text-gray-500">No alumni found.</p>
+              ) : (
+                filteredAlumni.map((alumnus) => (
+                  <div
+                    key={alumnus.user_id}
+                    className="bg-gray-50 shadow-md rounded-lg p-4 transition hover:shadow-xl"
+                  >
+                    <div className="flex items-center gap-4">
+                      <img
+                        src={alumnus.profile_picture || "/default-avatar.png"}
+                        alt={alumnus.name}
+                        className="w-12 h-12 rounded-full border"
+                      />
+                      <div>
+                        <h3 className="text-lg font-semibold">{alumnus.name}</h3>
+                        <p className="text-gray-500">{alumnus.degree}</p>
+                        <p className="text-sm text-gray-700">{alumnus.graduation_year}</p>
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                    <Link
+  to={`/user/${alumnus.user_id}`}
+  className="text-blue-500 hover:text-blue-700 underline"
+>
+  View Profile
+</Link>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

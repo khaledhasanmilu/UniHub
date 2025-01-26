@@ -70,7 +70,7 @@ const Sidebar = () => {
                   className="w-full text-left flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-700 active:bg-gray-600 transition duration-200"
                 >
                   <FontAwesomeIcon icon={faQuestionCircle} className="h-5 w-5" />
-                  <span>Question Bank</span>
+                  <span>Share Note's</span>
                 </button>
               </li>
               <li>

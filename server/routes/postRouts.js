@@ -10,4 +10,6 @@ router.get('/:userId', postController.getPostsByUserId);
 router.post('/updateLike', postController.updateLike);
 router.post('/addComment', postController.addComment);
 router.post('/uniPost', postController.getUniPosts);
+router.get('/getComments/:postId', postController.getComments);
+
 module.exports = router;

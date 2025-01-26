@@ -105,16 +105,7 @@ CREATE TABLE applications (
 );
 
 
--- Create `research_papers` table
-CREATE TABLE research_papers (
-    paper_id INT AUTO_INCREMENT PRIMARY KEY,
-    uploaded_by INT NOT NULL,
-    title VARCHAR(255) NOT NULL,
-    abstract TEXT,
-    file_url VARCHAR(255) NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (uploaded_by) REFERENCES users(user_id) ON DELETE CASCADE
-);
+
 -- Create `user_profiles` table
 CREATE TABLE user_profiles (
   `id` int(11) NOT NULL,
@@ -176,3 +167,5 @@ CREATE TABLE requests (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
+
+

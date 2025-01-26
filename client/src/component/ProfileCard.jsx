@@ -30,10 +30,11 @@ function ProfileCard({ id }) {
     linkedin: "",
     github: "",
     skills: "",
+    role: "",
   });
   const navigate = useNavigate();
   const currentUserId = Cookies.get("uid"); // Assume the current user is fetched from cookies
-
+  console.log("Current User ID", profile.role);
   useEffect(() => {
     fetchProfileData();
   }, [id]); // Fetch profile data when `id` changes
@@ -175,11 +176,20 @@ const handleMessenger = async () => {
           <h2 className="text-2xl font-semibold text-gray-800">
             {profile.name}
           </h2>
-          <p className="text-gray-600">{profile.degree}</p>
-          <p className="text-gray-600">University: {profile.university}</p>
-          <p className="text-gray-500">Class of : {profile.graduationYear}</p>
-          <p className=" text-gray-500">Skills : {profile.skills}</p>
-          <p className="mt-4 text-gray-700">{profile.bio}</p>
+
+
+
+          {profile.role !== "Industry" && (
+            <>
+              <p className="text-gray-600">{profile.degree}</p>
+              <p className="text-gray-600">University: {profile.university}</p>
+              <p className="text-gray-500">Class of : {profile.graduationYear}</p>
+              <p className="text-gray-500">Skills : {profile.skills}</p>
+              <p className="mt-4 text-gray-700">{profile.bio}</p>
+            </>
+          )}
+
+
 
           <div className="mt-4 flex space-x-4">
             <a

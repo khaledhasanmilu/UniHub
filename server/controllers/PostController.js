@@ -184,10 +184,42 @@ const addComment = (req, res) => {
   });
 };
 
+const getComments = (req, res) => {
+  const { postId } = req.params;
+
+  const query = `
+    SELECT 
+    comments.comment_id,
+    comments.content,
+    comments.created_at,
+    comments.user_id,
+    users.name AS username,
+    users.profile_picture AS userImage
+FROM comments
+JOIN users ON comments.user_id = users.user_id
+WHERE comments.post_id = ?
+ORDER BY comments.created_at DESC;
+  `;
+
+  db.query(query, [postId], (err, result) => {
+    if (err) {
+      console.error("Error fetching comments:", err);
+      return res.status(500).json({ message: "Error fetching comments" });
+    }
+
+    if (result.length === 0) {
+      console.log("No comments found for the given post.");
+      return res.status(404).json({ message: "No comments found" });
+    }
+    res.status(200).json(result);
+  });
+};
+
 module.exports = {
   createPost,
   getPostsByUserId,
   updateLike,
   getUniPosts,
-  addComment
+  addComment,
+  getComments,
 };

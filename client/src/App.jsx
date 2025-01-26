@@ -16,12 +16,12 @@ import Jobs from "./pages/Jobs";
 import Application from "./pages/Application";
 import ApplyJob from "./pages/ApplyJob";
 import NotFound from "./pages/NotFound";
-
+import AdminDashboard from "./pages/AdminDashboard";
 const App = () => {
   return (
     <Routes>
       <Route path="/login" element={<WelcomePage />} />
-
+      <Route path="/admin" element={<AdminDashboard />} />
       {/* Redirect "/" to "/feed" */}
       <Route path="/" element={<Navigate to="/feed" replace />} />
 

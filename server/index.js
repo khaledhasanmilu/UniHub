@@ -13,7 +13,7 @@ const noteRoutes = require('./routes/note');
 const alumniRoutes = require('./routes/alumni');
 const chatRoutes = require('./routes/chat');
 const teamRoutes = require('./routes/team');
-
+const adminRoutes = require('./routes/admin');
 const app = express();
 const http = require('http');
 const server = http.createServer(app);  // Use HTTP server for WebSockets
@@ -61,6 +61,7 @@ app.use('/api/note', noteRoutes);
 app.use('/api/alumni', alumniRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/team', teamRoutes);
+app.use('/api/admin',adminRoutes);  
 // WebSocket Events
 
 

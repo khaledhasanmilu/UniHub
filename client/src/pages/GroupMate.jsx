@@ -4,22 +4,23 @@ import axios from "axios";
 import RequestCard from '../component/RequestCard'; // Importing the RequestCard
 import Cookies from 'js-cookie';
 
+
 function GroupMate() {
     const userid = Cookies.get('uid');
     const username = Cookies.get('username');
-
+    const uni = localStorage.getItem('university');
     const [searchQuery, setSearchQuery] = useState('');
     const [viewMyRequests, setViewMyRequests] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [editRequest, setEditRequest] = useState(null); // To handle editing requests
     const [newRequest, setNewRequest] = useState({
-        userId: userid,
-        userName: username,
-        projectName: '',
-        courseName: '',
+        user_id: userid,
+        username: username,
+        project_name: '',
+        course_name: '',
         semester: '',
         description: '',
-        endTime: ''
+        end_time: ''
     });
 
     const [requests, setRequests] = useState([]); // Holds all requests
@@ -28,7 +29,9 @@ function GroupMate() {
         // Fetch data from backend
         const fetchRequests = async () => {
             try {
-                const response = await axios.get("http://localhost:5000/api/team/requests");
+                const response = await axios.get(`http://localhost:5000/api/team/requests/${uni}`,{
+                  withCredentials: true,
+                });
                 setRequests(response.data); // Assuming the data is an array of requests
             } catch (error) {
                 console.error("Error fetching requests:", error);
@@ -47,18 +50,19 @@ function GroupMate() {
     };
 
     const handleCreateRequest = () => {
-      setEditRequest(null); // Ensure we are not editing an existing request
-      setNewRequest({
-          userId: userid,
-          userName: username,
-          projectName: '',
-          courseName: '',
-          semester: '',
-          description: '',
-          endTime: ''
-      });  // Reset new request state
-      setShowModal(true);  // Show the modal
-  };
+        setEditRequest(null); // Ensure we are not editing an existing request
+        setNewRequest({
+            user_id: userid,
+            username: username,
+            project_name: '',
+            course_name: '',
+            semester: '',
+            description: '',
+            end_time: ''
+        });  // Reset new request state
+        setShowModal(true);  // Show the modal
+    };
+
     const handleCloseModal = () => {
         setShowModal(false);  // Close the modal
     };
@@ -76,36 +80,47 @@ function GroupMate() {
     };
 
     const handleSubmitRequest = async () => {
-        try {
-            const requestData = editRequest ? editRequest : newRequest; // Use editRequest if editing
-            const url = editRequest 
-                ? `http://localhost:5000/api/team/requests/${editRequest._id}` // Update request endpoint
-                : "http://localhost:5000/api/team/requests"; // Create request endpoint
-
-            const method = editRequest ? 'put' : 'post'; // Use PUT for update, POST for create
-
-            const response = await axios[method](url, requestData);
+      const requestData =  newRequest;
+      try {
+          const url = editRequest 
+              ? `http://localhost:5000/api/team/requests/${editRequest.request_id}` // Update request endpoint
+              : "http://localhost:5000/api/team/requests"; // Create request endpoint
+  
+          const method = editRequest ? 'put' : 'post'; // Use PUT for update, POST for create
+          const response = await axios[method](url, requestData);
+          
+          if (response.status === (editRequest ? 200 : 201)) {
+              // Successfully created or updated the request
+              if (editRequest) {
+                  setRequests(prevRequests => prevRequests.map(request => String(request.request_id) === String(editRequest.request_id) ? requestData : request));
+              } else {
+                  setRequests([...requests, response.data]);
+              }
+              console.log(editRequest?"edited":"created");
+              setShowModal(false);
             
-            if (response.status === (editRequest ? 200 : 201)) {
-                // Successfully created or updated the request, update the requests list
-                if (editRequest) {
-                    setRequests(prevRequests => prevRequests.map(request => request._id === editRequest._id ? response.data : request)); // Update the edited request
-                } else {
-                    setRequests([...requests, response.data]);  // Add new request to the list
-                }
-                setShowModal(false);  // Close the modal after submitting
-               
-            }
-        } catch (error) {
-            console.error("Error submitting request:", error);
-        }
-    };
-
-    const handleEditRequest = (request) => {
-      setEditRequest(request); // Set the request to be edited
-      setNewRequest({ ...request }); // Pre-fill the form with the request data using a copy
-      setShowModal(true);  // Show the modal
+          }
+      } catch (error) {
+          console.error("Error submitting request:", error);
+      }
   };
+  
+
+  const handleEditRequest = (request) => {
+    setEditRequest(request); // Set the request to be edited
+    console.log(request.request_id);
+    setNewRequest({
+      request_id: request.id,
+      user_id: request.user_id,
+      username: request.username,
+      project_name: request.project_name,
+      course_name: request.course_name,
+      semester: request.semester,
+      description: request.description,
+      end_time: request.end_time
+    }); // Pre-fill the form with the request data using a copy
+    setShowModal(true);  // Show the modal
+};
 
     const handleDeleteRequest = async (id) => {
         const confirmDelete = window.confirm("Are you sure you want to delete this request?");
@@ -114,7 +129,7 @@ function GroupMate() {
                 const response = await axios.delete(`http://localhost:5000/api/team/requests/${id}`);
                 if (response.status === 200) {
                     // Successfully deleted the request, update the requests list
-                    setRequests(requests.filter(request => request._id !== id));
+                    setRequests(requests.filter(request => request.request_id !== id));
                 }
             } catch (error) {
                 console.error("Error deleting request:", error);
@@ -126,18 +141,18 @@ function GroupMate() {
     const filteredRequests = requests.filter(request => {
         // Filter by search query
         const searchMatch = (
-            request.projectName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            request.courseName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            request.semester.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            request.description.toLowerCase().includes(searchQuery.toLowerCase())
-        );
+          (request.project_name && request.project_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          (request.course_name && request.course_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          (request.semester && request.semester.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          (request.description && request.description.toLowerCase().includes(searchQuery.toLowerCase()))
+      );
+      
 
         // Filter by viewMyRequests flag
-        const userMatch = viewMyRequests ? request.userId === userid : true;
+        const userMatch = viewMyRequests ? String(request.user_id) === userid : true;
 
         return searchMatch && userMatch;
     });
-
     return (
         <div className="min-h-screen flex bg-gray-100 px-8">
             <div className="flex-1">
@@ -192,16 +207,16 @@ function GroupMate() {
                                 <div key={index} className="relative">
                                     <RequestCard request={request} />
                                     {/* Edit and Delete Buttons */}
-                                    {request.userId === userid && (
+                                    {String(request.user_id )=== userid && (
                                         <div className="absolute top-0 right-0 m-4 flex gap-2">
                                             <button
-                                                onClick={() => handleEditRequest(request, index)}
+                                                onClick={() => handleEditRequest(request)}
                                                 className="bg-yellow-600 text-white px-2 py-1 rounded-md hover:bg-yellow-700"
                                             >
                                                 <FaEdit />
                                             </button>
                                             <button
-                                                onClick={() => handleDeleteRequest(request,index)}
+                                                onClick={() => handleDeleteRequest(request.request_id)}
                                                 className="bg-red-600 text-white px-2 py-1 rounded-md hover:bg-red-700"
                                             >
                                                 <FaTrash />
@@ -226,8 +241,8 @@ function GroupMate() {
                             <label className="block mb-2 text-sm font-medium">Project Name:</label>
                             <input
                                 type="text"
-                                name="projectName"
-                                value={newRequest.projectName}
+                                name="project_name"
+                                value={newRequest.project_name}
                                 onChange={handleInputChange}
                                 className="w-full p-2 border border-gray-300 rounded-md"
                             />
@@ -237,8 +252,8 @@ function GroupMate() {
                             <label className="block mb-2 text-sm font-medium">Course Name:</label>
                             <input
                                 type="text"
-                                name="courseName"
-                                value={newRequest.courseName}
+                                name="course_name"
+                                value={newRequest.course_name}
                                 onChange={handleInputChange}
                                 className="w-full p-2 border border-gray-300 rounded-md"
                             />
@@ -269,8 +284,8 @@ function GroupMate() {
                             <label className="block mb-2 text-sm font-medium">End Time:</label>
                             <input
                                 type="date"
-                                name="endTime"
-                                value={newRequest.endTime}
+                                name="end_time"
+                                value={newRequest.end_time}
                                 onChange={handleInputChange}
                                 className="w-full p-2 border border-gray-300 rounded-md"
                             />
