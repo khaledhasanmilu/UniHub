@@ -1,41 +1,22 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import Sidebar from './../component/admin/Sidebar';
-
-
-const DashboardContent = ({ selectedOption }) => {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  // Function to fetch data based on selected option
-  const fetchData = async (endpoint) => {
-    setLoading(true);
-    try {
-      const response = await axios.get(endpoint);
-      setData(response.data);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      setData(null);
-    }
-    setLoading(false);
-  };
-
- 
-
-  return (
-    <div className="flex-1 p-8">
-      <div id="content" className="space-y-6">
-        
-      </div>
-    </div>
-  );
-};
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Sidebar from '../component/admin/Sidebar';
+import DashboardContent from '../component/admin/DashboardContent';
+import Cookies from 'js-cookie';
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
+  const role = Cookies.get('role');
   const [selectedOption, setSelectedOption] = useState('dashboard');
 
+  useEffect(() => {
+    if (role !== 'admin') {
+      navigate('/feed'); // Redirect if not an admin
+    }
+  }, [role, navigate]);
+
   return (
-    <div className="flex">
+    <div className="flex h-screen">
       <Sidebar onSelectOption={setSelectedOption} />
       <DashboardContent selectedOption={selectedOption} />
     </div>

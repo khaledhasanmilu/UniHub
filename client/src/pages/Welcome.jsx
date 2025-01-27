@@ -9,9 +9,13 @@ const WelcomePage = () => {
   
     useEffect(() => {
       const authToken = Cookies.get('authToken');
+      const role = Cookies.get('role');
+
       console.log('authToken:', authToken);
       if (authToken) {
-        navigate('/dashboard');
+          if(role === 'admin') navigate('/admin')
+          else
+              navigate('/dashboard');
       }else{
           navigate('/login');
       }

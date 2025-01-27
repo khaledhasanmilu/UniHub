@@ -8,7 +8,7 @@ const Dashboard = () => {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const userid = Cookies.get('uid'); // Add this line to get the user ID from local storage
-
+    const role = Cookies.get('role');   
     useEffect(() => {
         const uni = localStorage.getItem('university');
         const data = {

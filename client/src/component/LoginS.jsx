@@ -206,7 +206,7 @@ const SlidingLoginRegister = () => {
 {(userType === 'Student' || userType === 'Alumni') && (
   <ReactDropdown
     options={universityOptions.map((uni) => ({
-      value: uni.id, // This should be the university ID
+      value: uni.university_id, // This should be the university ID
       label: uni.name, // This is the university name
     }))}
     onChange={(selectedOption) => setSelectedUniversity(selectedOption.value)} // This will set the university ID
