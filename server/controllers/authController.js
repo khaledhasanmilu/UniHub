@@ -12,11 +12,13 @@ exports.registerUser = (req, res) => {
 
   if(userType !== 'Student' && userType !== 'Alumni' && userType !== 'Industry'){
     return res.status(400).json({ message: 'Invalid user type.' });
+
   }
-  if(userType === 'Student'|| userType==='Alumni' && !university){
+  
+  if((userType === 'Student'|| userType==='Alumni' )&& (!university)){
     return res.status(400).json({ message: 'University ID is required for students and Alunmi.' });
   }
-
+  console.log(email);
   bcrypt.hash(password, 10, (err, hashedPassword) => {
     if (err) return res.status(500).json({ message: 'Error hashing password' });
 

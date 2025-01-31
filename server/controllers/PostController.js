@@ -43,6 +43,7 @@ const getPostsByUserId = (req, res) => {
     posts.content,
     posts.imageUrl, 
     posts.created_at, 
+    posts.creator_id,
     users.name AS creator_name, 
     users.profile_picture, 
     COUNT(DISTINCT likes.like_id) AS like_count,
@@ -127,27 +128,33 @@ const updateLike = (req, res) => {
 
 const getUniPosts = (req, res) => {
   const { user_id, university } = req.body;
+
   const query = `
     SELECT 
-    posts.post_id, 
-    posts.content,
-    posts.imageUrl, 
-    posts.created_at, 
-    users.name AS creator_name, 
-    users.profile_picture, 
-    COUNT(DISTINCT likes.like_id) AS like_count, -- Count all likes for the post
-    COUNT(DISTINCT CASE WHEN likes.user_id = ? THEN likes.like_id ELSE NULL END) AS user_liked, -- Check if user with ID 4 liked the post
-    COUNT(DISTINCT comments.comment_id) AS comment_count -- Count all comments for the post
-FROM posts
-JOIN users ON posts.creator_id = users.user_id
-LEFT JOIN likes ON posts.post_id = likes.post_id
-LEFT JOIN comments ON posts.post_id = comments.post_id
-WHERE posts.creator_id = ? OR users.university_id = ?
-GROUP BY posts.post_id, posts.content, posts.imageUrl, posts.created_at, users.name, users.profile_picture
-ORDER BY posts.created_at DESC;
+      posts.post_id, 
+      posts.content,
+      posts.imageUrl, 
+      posts.created_at, 
+      posts.creator_id,
+      users.name AS creator_name, 
+      users.profile_picture, 
+      COUNT(DISTINCT likes.like_id) AS like_count,
+      COUNT(DISTINCT CASE WHEN likes.user_id = ? THEN 1 ELSE NULL END) AS user_liked,
+      COUNT(DISTINCT comments.comment_id) AS comment_count
+    FROM posts
+    JOIN users ON posts.creator_id = users.user_id
+    LEFT JOIN likes ON posts.post_id = likes.post_id
+    LEFT JOIN comments ON posts.post_id = comments.post_id
+    WHERE posts.creator_id = ? 
+       OR users.university_id = ? 
+       OR posts.creator_id IN (
+         SELECT followed FROM followers WHERE follower = ?
+       )
+    GROUP BY posts.post_id, posts.content, posts.imageUrl, posts.created_at, users.name, users.profile_picture
+    ORDER BY posts.created_at DESC;
   `;
 
-  db.query(query, [user_id,user_id, university], (err, result) => {
+  db.query(query, [user_id, user_id, university, user_id], (err, result) => {
     if (err) {
       console.error("Error fetching posts:", err);
       return res.status(500).json({ message: "Error fetching posts" });
@@ -157,6 +164,7 @@ ORDER BY posts.created_at DESC;
       console.log("No posts found for the given criteria.");
       return res.status(404).json({ message: "No posts found" });
     }
+
     res.status(200).json({
       success: true,
       posts: result,
@@ -182,10 +190,42 @@ const addComment = (req, res) => {
   });
 };
 
+const getComments = (req, res) => {
+  const { postId } = req.params;
+
+  const query = `
+    SELECT 
+    comments.comment_id,
+    comments.content,
+    comments.created_at,
+    comments.user_id,
+    users.name AS username,
+    users.profile_picture AS userImage
+FROM comments
+JOIN users ON comments.user_id = users.user_id
+WHERE comments.post_id = ?
+ORDER BY comments.created_at DESC;
+  `;
+
+  db.query(query, [postId], (err, result) => {
+    if (err) {
+      console.error("Error fetching comments:", err);
+      return res.status(500).json({ message: "Error fetching comments" });
+    }
+
+    if (result.length === 0) {
+      console.log("No comments found for the given post.");
+      return res.status(404).json({ message: "No comments found" });
+    }
+    res.status(200).json(result);
+  });
+};
+
 module.exports = {
   createPost,
   getPostsByUserId,
   updateLike,
   getUniPosts,
-  addComment
+  addComment,
+  getComments,
 };

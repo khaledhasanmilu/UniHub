@@ -1,34 +1,130 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios"; 
+import io from "socket.io-client"; // Import socket.io client
+import MassegeCard from "../component/MessegeCard";
+import MassegeContainer from "../component/MessageContainer";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faComment } from "@fortawesome/free-solid-svg-icons";
 
-const dummyMessages = [
-    { id: 1, user: 'Alice', message: 'Hi there!' },
-    { id: 2, user: 'Bob', message: 'Hello! How are you?' },
-    { id: 3, user: 'Alice', message: 'I am good, thanks! What about you?' },
-    { id: 4, user: 'Bob', message: 'I am doing well, thank you!' },
-];
+// Connect to the socket server
+const socket = io("http://localhost:5000"); // Replace with your backend URL
 
 const Massege = () => {
-    return (
-        <div className="min-h-screen flex flex-col bg-gray-100">
-            <div className="flex-1">
-              
-                <div className=" p-8 ml-64 max-w-6xl">
-                    <div className="text-2xl font-bold mb-4 text-gray-800">Chat with User</div>
-                    <div className="flex-1 overflow-y-auto mb-4 p-4 bg-white rounded shadow">
-                        {dummyMessages.map(msg => (
-                            <div key={msg.id} className={`p-3 my-2 rounded-lg max-w-md ${msg.user === 'Alice' ? 'bg-blue-100 self-start' : 'bg-green-100 self-end'}`}>
-                                <strong className="text-gray-700">{msg.user}:</strong> <span className="text-gray-600">{msg.message}</span>
-                            </div>
-                        ))}
-                    </div>
-                    <div className="flex mt-4">
-                        <input type="text" placeholder="Type a message" className="flex-1 p-3 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                        <button className="p-3 bg-blue-500 text-white rounded-r-lg hover:bg-blue-600">Send</button>
-             </div>
-            </div>
+  const navigate = useNavigate();
+  const { id } = useParams(); 
+
+  const [users, setUsers] = useState([]); 
+  const [selectedUser, setSelectedUser] = useState(null); 
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/chat/getChat`, {
+          withCredentials: true,
+        });
+
+        const usersList = response.data;
+
+        // Add the user from the URL (`id`) if not already in the list
+        const userFromUrl = usersList.find((user) => user.id === parseInt(id));
+        if (userFromUrl) {
+          // If the user is already in the list, set them as selected
+          setSelectedUser(userFromUrl);
+        } else {
+          // If the user is not in the list, fetch and add them to the top
+          const user = await axios.get(`http://localhost:5000/api/chat/getUser/${id}`,);
+          
+          const newUser = {
+            id: parseInt(id),
+            name: user.data.name||'New User', // Fetch user data from your API as necessary
+            image: user.data.profile_picture||'http://localhost:5000/uploads/images/user.png', // Mock image for now
+          };
+          console.log(id);
+          if(id){
+            // const response = await axios.post(`http://localhost:5000/api/chat/addChat`, {
+            //   withCredentials: true,
+            //   user: newUser
+            // });
+            // console.log("response",response);
+            usersList.unshift(newUser); // Add the new user to the top
+            console.log(newUser);
+
+            setSelectedUser(newUser); // Set as selected
+          }else{
+            setSelectedUser(usersList[0]); // Set the first user as selected
+          }
+           // Add the new user to the top
+           // Set as selected user
+        }
+
+        setUsers(usersList);
+        
+
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    };
+
+    fetchUsers();
+
+    // Listen for real-time updates when a new message is received
+    socket.on("newMessage", (message) => {
+      console.log("New message received:", message);
+      // Optionally, you can fetch messages again or update the UI dynamically
+    });
+
+    return () => {
+      socket.off("newMessage"); // Cleanup socket listener
+    };
+  }, [id]);
+
+  const handleUserSelect = (user) => {
+    setSelectedUser(user);
+    navigate(`/messages/${user.id}`); 
+  };
+
+  const sortedUsers = users.sort((a, b) => {
+    if (parseInt(id) === a.id) return -1; // Move the selected user to the top
+    if (parseInt(id) === b.id) return 1;  // Move the selected user to the top
+    return 0; // Keep other users in their original order
+  });
+
+  return (
+    <div className="min-h-[calc(100vh-100px)] bg-gray-100 mx-8 ">
+      <div className="bg-white shadow-md rounded-md min-h-[calc(100vh-100px)] max-w-6xl w-full mx-60 p-5">
+        <div className="flex gap-2">
+          <div className="w-[calc(100vh/2.2)] max-h-[calc(100vh-110px)] overflow-y-auto">
+            {users.length > 0 && (
+              <>
+                <div className="bg-blue-500 text-white text-center text-lg font-semibold p-3 rounded-t-md">
+                  <span className="ml-2 flex items-center justify-evenly">
+                    Messages
+                    <FontAwesomeIcon icon={faComment} />
+                  </span>
+                </div>
+
+                {sortedUsers.map((user) => (
+                  <div key={user.id} onClick={() => handleUserSelect(user)} className="cursor-pointer">
+                    <MassegeCard name={user.name} image={user.image} />
+                  </div>
+                ))}
+              </>
+            )}
+          </div>
+
+          <div className="flex-1">
+            {selectedUser ? (
+              <MassegeContainer user={selectedUser} socket={socket} />
+            ) : (
+              <p className="text-center text-gray-500">No user selected</p>
+            )}
+          </div>
+
         </div>
-        </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 export default Massege;

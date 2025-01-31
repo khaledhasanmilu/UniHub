@@ -4,6 +4,7 @@ import axios from 'axios';
 import Post from '../component/Post';
 import CreatePost from '../component/CreatePost';
 import { Helmet } from 'react-helmet';
+import ProfileCard from '../component/ProfileCard';
 
 const ProfilePage = () => {
   const [username, setUsername] = useState('');
@@ -57,14 +58,7 @@ const ProfilePage = () => {
     }
   };
 
-  const handleProfileImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file && file.type.startsWith('image/')) {
-      setNewProfileImage(file);
-    } else {
-      alert('Please upload a valid image file.');
-    }
-  };
+  
 
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
@@ -126,7 +120,7 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="min-h-screen flex bg-gray-100">
+    <div className="min-h-screen flex bg-gray-100 ">
       <Helmet>
         <title>UniHub - Profile</title>
       </Helmet>
@@ -137,25 +131,11 @@ const ProfilePage = () => {
 
         <div className="bg-white shadow-md rounded-md max-w-4xl mx-80 w-full p-16">
           {/* Profile Header */}
-          <div className="flex items-center h-80 mb-6">
-            <img
-              src={profileImage}
-              alt="Profile"
-              className="w-40 h-40 rounded-full object-cover border-4 border-blue-500"
-            />
-            <div className="flex-1">
-              <div className="text-3xl font-semibold">{username}</div>
-              <div className="text-lg text-gray-600">{email}</div>
-              <div className="mt-4">
-                <button
-                  onClick={() => setIsEditing(!isEditing)}
-                  className="bg-blue-500 text-white py-2 px-6 rounded-md hover:bg-blue-600 transition duration-200"
-                >
-                  {isEditing ? 'Cancel' : 'Edit Profile'}
-                </button>
-              </div>
-            </div>
-          </div>
+         
+         
+         <ProfileCard id={userid}/>
+       
+         
 
           
        

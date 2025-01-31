@@ -9,7 +9,7 @@ const Event = () => {
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
 
-
+  const university = localStorage.getItem('university');
 
   const filteredEvents = events.filter(
     (event) => filter === 'all' || event.event_type === filter
@@ -18,7 +18,7 @@ const Event = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await axios.post('http://localhost:5000/api/event/getEvent', { filter: 'all' });
+        const response = await axios.post('http://localhost:5000/api/event/getEvent', { filter: 'all',university:university });
         setEvents(response.data.events); // Assuming response contains an `events` array
       } catch (error) {
         console.error('Error fetching events:', error);
@@ -34,7 +34,7 @@ const Event = () => {
 
 
   return (
-    <div className="min-h-screen flex bg-gray-100">
+    <div className="min-h-screen flex bg-gray-100 mx-8">
       <Helmet>
         <title>UniHub - Event</title>
       </Helmet>

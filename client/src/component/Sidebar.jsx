@@ -70,7 +70,7 @@ const Sidebar = () => {
                   className="w-full text-left flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-700 active:bg-gray-600 transition duration-200"
                 >
                   <FontAwesomeIcon icon={faQuestionCircle} className="h-5 w-5" />
-                  <span>Question Bank</span>
+                  <span>Share Note's</span>
                 </button>
               </li>
               <li>
@@ -84,11 +84,11 @@ const Sidebar = () => {
               </li>
               <li>
                 <button
-                  onClick={() => navigate('/research')}
+                  onClick={() => navigate('/jobs')}
                   className="w-full text-left flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-700 active:bg-gray-600 transition duration-200"
                 >
-                  <FontAwesomeIcon icon={faNetworkWired} className="h-5 w-5" />
-                  <span>Research</span>
+                  <FontAwesomeIcon icon={faBriefcase} className="h-5 w-5" />
+                  <span>Jobs</span>
                 </button>
               </li>
             </>
@@ -144,15 +144,7 @@ const Sidebar = () => {
                   <span>Applications</span>
                 </button>
               </li>
-              <li>
-                <button
-                  onClick={() => navigate('/messages')}
-                  className="w-full text-left flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-700 active:bg-gray-600 transition duration-200"
-                >
-                  <FontAwesomeIcon icon={faComment} className="h-5 w-5" />
-                  <span>Messages</span>
-                </button>
-              </li>
+              
             </>
           )}
         </ul>

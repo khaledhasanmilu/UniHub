@@ -76,25 +76,96 @@ CREATE TABLE comments (
 
 -- Create `jobs` table
 CREATE TABLE jobs (
-    job_id INT AUTO_INCREMENT PRIMARY KEY,
-    posted_by INT NOT NULL,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
+    company VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
-    location VARCHAR(255),
-    salary VARCHAR(100),
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (posted_by) REFERENCES users(user_id) ON DELETE CASCADE
+    job_type ENUM('Full-Time', 'Part-Time', 'Internship', 'Contract') NOT NULL DEFAULT 'Full-Time',
+    expected_salary VARCHAR(50) NOT NULL,
+    application_deadline DATE NOT NULL,
+    required_skills TEXT NOT NULL,
+    image_url VARCHAR(255) DEFAULT NULL,
+    creator_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (creator_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
--- Create `research_papers` table
-CREATE TABLE research_papers (
-    paper_id INT AUTO_INCREMENT PRIMARY KEY,
-    uploaded_by INT NOT NULL,
-    title VARCHAR(255) NOT NULL,
-    abstract TEXT,
-    file_url VARCHAR(255) NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (uploaded_by) REFERENCES users(user_id) ON DELETE CASCADE
+-- Create `applications` table
+CREATE TABLE applications (
+    application_id INT AUTO_INCREMENT PRIMARY KEY,
+    job_id INT,
+    applicant_name VARCHAR(255) NOT NULL,
+    applicant_email VARCHAR(255) NOT NULL,
+    resume_url VARCHAR(255) NOT NULL,
+    cover_letter TEXT,
+    application_status ENUM('Pending', 'Reviewed', 'Accepted', 'Rejected') NOT NULL DEFAULT 'Pending',
+    applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE
 );
+
+
+
+-- Create `user_profiles` table
+CREATE TABLE user_profiles (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `degree` varchar(255) DEFAULT NULL,
+  `graduation_year` int(11) DEFAULT NULL,
+  `skills` text DEFAULT NULL,
+  `bio` text DEFAULT NULL,
+  `twitter` varchar(500) DEFAULT NULL,
+  `linkedin` varchar(500) DEFAULT NULL,
+  `github` varchar(500) DEFAULT NULL,
+   PRIMARY KEY (`id`),
+   FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+-- Create `followers` table
+CREATE TABLE `followers` (
+  follower int(11) NOT NULL,
+  followed int(11) NOT NULL,
+  PRIMARY KEY (`follower`,`followed`),
+    
+  ADD CONSTRAINT `fk_fllow` FOREIGN KEY (`follower`) REFERENCES `users` (`user_id`),
+  ADD CONSTRAINT `fk_fllow2` FOREIGN KEY (`followed`) REFERENCES `users` (`user_id`);
+)
+
+
+
+CREATE TABLE notes (
+    note_id INT PRIMARY KEY AUTO_INCREMENT,
+    university_id INT,
+    creator_id INT,
+    course_code VARCHAR(50) NOT NULL,
+    course_name VARCHAR(255) NOT NULL,
+    short_description TEXT,
+    content_url VARCHAR(500), -- File URL for uploaded notes
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (university_id) REFERENCES universities(university_id) ON DELETE CASCADE,
+    FOREIGN KEY (creator_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+CREATE TABLE messages (
+    message_id INT AUTO_INCREMENT PRIMARY KEY,
+    sender_id INT NOT NULL,
+    receiver_id INT NOT NULL,
+    text TEXT NOT NULL,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (sender_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (receiver_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+CREATE TABLE requests (
+    request_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    project_name VARCHAR(255) NOT NULL,
+    course_name VARCHAR(255) NOT NULL,
+    semester VARCHAR(100) NOT NULL,
+    description TEXT NOT NULL,
+    end_time DATE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
 
